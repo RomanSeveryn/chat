@@ -6,7 +6,7 @@ export const ChatListScreen = ({ navigation }) => {
       <Text>Hi ChatListScreen</Text>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('ChatSettingsScreen');
+          navigation.navigate('ChatScreen');
         }}
       >
         <Text>Click</Text>
