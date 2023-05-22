@@ -2,13 +2,20 @@ import { StyleSheet, View, Text, TextInput } from 'react-native';
 import colors from '../constants/colors';
 
 export const Input = ({
+  id,
   label,
   iconName,
   iconSize,
   errorText,
   IconPack,
+  onInputChanged,
   style,
+  ...rest
 }) => {
+  const onChangeText = (text) => {
+    onInputChanged(id, text);
+  };
+
   return (
     <View style={{ ...styles.container, ...style }}>
       <Text style={styles.label}>{label}</Text>
@@ -16,11 +23,11 @@ export const Input = ({
         {iconName && (
           <IconPack name={iconName} size={iconSize} style={styles.icon} />
         )}
-        <TextInput style={styles.input} />
+        <TextInput style={styles.input} onChangeText={onChangeText} {...rest} />
       </View>
       {errorText && (
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{errorText}</Text>
+          <Text style={styles.errorText}>{errorText[0]}</Text>
         </View>
       )}
     </View>
