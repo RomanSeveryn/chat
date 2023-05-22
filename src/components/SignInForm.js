@@ -6,6 +6,10 @@ import { reducer } from '../reducers/formReducer';
 import { useCallback, useReducer } from 'react';
 
 const initialState = {
+  inputValues: {
+    email: '',
+    password: '',
+  },
   inputValidities: {
     email: false,
     password: false,
@@ -18,7 +22,7 @@ export const SignInForm = () => {
   const inputChangedHandler = useCallback(
     (inputId, inputValue) => {
       const result = validateInput(inputId, inputValue);
-      dispatchFormState({ inputId, validationResult: result });
+      dispatchFormState({ inputId, validationResult: result, inputValue });
     },
     [dispatchFormState],
   );
