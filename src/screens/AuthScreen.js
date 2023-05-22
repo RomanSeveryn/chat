@@ -1,43 +1,47 @@
-import { StyleSheet } from 'react-native';
+import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FontAwesome, Feather } from '@expo/vector-icons';
+import {
+  TouchableOpacity,
+  Text,
+  Image,
+  View,
+  StyleSheet,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { PageContainer } from '../components/PageContainer';
-import { Input } from '../components/Input';
-import { SubmitButton } from '../components/SubmitButton';
+import { SignUpForm } from '../components/SignUpForm';
+import { SignInForm } from '../components/SignInForm';
+import colors from '../constants/colors';
+import logo from '../../assets/images/logo.png';
 
 export const AuthScreen = () => {
+  const [isSignUp, setIsSignUp] = useState(false);
+
   return (
     <SafeAreaView style={styles.container}>
       <PageContainer>
-        <Input
-          label='First Name'
-          iconName='user-o'
-          IconPack={FontAwesome}
-          iconSize={24}
-        />
-        <Input
-          label='Last Name'
-          iconName='user-o'
-          IconPack={FontAwesome}
-          iconSize={24}
-        />
-        <Input
-          label='First Name'
-          iconName='mail'
-          IconPack={Feather}
-          iconSize={24}
-        />
-        <Input
-          label='First Name'
-          iconName='lock'
-          IconPack={Feather}
-          iconSize={24}
-        />
-        <SubmitButton
-          title='Sign up'
-          onPress={() => console.log(123)}
-          style={{ marginTop: 12 }}
-        />
+        <ScrollView>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'height' : undefined}
+            keyboardVerticalOffset={100}
+            style={styles.keyboardAvoidingView}
+          >
+            <View style={styles.imageContainer}>
+              <Image source={logo} resizeMode='contain' style={styles.image} />
+            </View>
+            {isSignUp ? <SignUpForm /> : <SignInForm />}
+            <TouchableOpacity
+              style={styles.linkContainer}
+              onPress={() => setIsSignUp((prev) => !prev)}
+            >
+              <Text style={styles.link}>{`Switch to ${
+                isSignUp ? 'sign in' : 'sign up'
+              }`}</Text>
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
+        </ScrollView>
       </PageContainer>
     </SafeAreaView>
   );
@@ -48,8 +52,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  label: {
-    fontSize: 32,
-    fontFamily: 'black',
+  linkContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 15,
+  },
+  link: {
+    color: colors.blue,
+    fontFamily: 'medium',
+    letterSpacing: 0.3,
+  },
+  imageContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  image: {
+    width: '50%',
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+    justifyContent: 'center',
   },
 });
