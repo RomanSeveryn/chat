@@ -4,6 +4,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { AppNavigator } from './src/navigation/AppNavigator';
+import { Provider } from 'react-redux';
+import { store } from './src/store/store';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -47,8 +49,10 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider onLayout={onLayout}>
-      <AppNavigator />
-    </SafeAreaProvider>
+    <Provider store={store}>
+      <SafeAreaProvider onLayout={onLayout}>
+        <AppNavigator />
+      </SafeAreaProvider>
+    </Provider>
   );
 }
