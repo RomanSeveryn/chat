@@ -6,6 +6,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { Provider } from 'react-redux';
 import { store } from './src/store/store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// AsyncStorage.clear();
 
 SplashScreen.preventAutoHideAsync();
 
