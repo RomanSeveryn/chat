@@ -9,7 +9,7 @@ export const ChatListScreen = ({ navigation }) => {
           navigation.navigate('ChatScreen');
         }}
       >
-        <Text>Click</Text>
+        <Text>Go to Chat screen</Text>
       </TouchableOpacity>
     </View>
   );
