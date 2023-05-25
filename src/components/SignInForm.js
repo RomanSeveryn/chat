@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer, useState } from 'react';
-import { Alert } from 'react-native';
+import { ActivityIndicator, Alert } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 import { Input } from './Input';
@@ -7,6 +7,7 @@ import { SubmitButton } from './SubmitButton';
 import { validateInput } from '../utils/actions/formActions';
 import { reducer } from '../reducers/formReducer';
 import { signIn } from '../utils/actions/authAction';
+import colors from '../constants/colors';
 
 const initialState = {
   inputValues: {
@@ -43,7 +44,7 @@ export const SignInForm = () => {
 
   const authHandler = useCallback(async () => {
     try {
-      // setIsLoading(true);
+      setIsLoading(true);
 
       const action = signIn(
         formState.inputValues.email,
@@ -53,10 +54,8 @@ export const SignInForm = () => {
       await dispatch(action);
     } catch (e) {
       setError(e.message);
-      // setIsLoading(false);
-      console.log('authHandler.e', e);
-    } finally {
       setIsLoading(false);
+      console.log('authHandler.e', e);
     }
   }, [dispatch, formState]);
 
@@ -84,12 +83,16 @@ export const SignInForm = () => {
         onInputChanged={inputChangedHandler}
         errorText={formState.inputValidities['password']}
       />
-      <SubmitButton
-        title='Sign in'
-        onPress={authHandler}
-        style={{ marginTop: 12 }}
-        disabled={!formState?.formIsValid}
-      />
+      {isLoading ? (
+        <ActivityIndicator size='small' color={colors.primary} />
+      ) : (
+        <SubmitButton
+          title='Sign in'
+          onPress={authHandler}
+          style={{ marginTop: 12 }}
+          disabled={!formState?.formIsValid}
+        />
+      )}
     </>
   );
 };
