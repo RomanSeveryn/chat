@@ -1,8 +1,42 @@
 import { getFirebaseApp } from '../firebaseHalper';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
 import { ref, child, set, getDatabase } from 'firebase/database';
 import { authenticate } from '../../store/authSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserData } from './userActions';
+
+export const signIn = (email, password) => {
+  return async (dispatch) => {
+    const app = getFirebaseApp();
+    const auth = getAuth(app);
+
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      const { uid, stsTokenManager } = result.user;
+      const { accessToken, expirationTime } = stsTokenManager;
+      const expiryDate = new Date(expirationTime);
+      const userData = await getUserData(uid);
+      dispatch(authenticate({ token: accessToken, userData }));
+      saveDataToStorage(accessToken, uid, expiryDate);
+    } catch (e) {
+      const errorCode = e.code;
+      console.log('signUp.e', e);
+
+      let message = 'Something went wrong.';
+      if (
+        errorCode === 'auth/wrong-password' ||
+        errorCode === 'auth/user-not-found'
+      ) {
+        message = 'The username or password was incorrect';
+      }
+      throw new Error(message);
+    }
+  };
+};
 
 export const signUp = (firstName, lastName, email, password) => {
   return async (dispatch) => {

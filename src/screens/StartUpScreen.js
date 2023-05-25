@@ -1,11 +1,11 @@
 import { ActivityIndicator, View } from 'react-native';
+import { useDispatch } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import colors from '../constants/colors';
 import commonStyles from '../constants/commonStyles';
 import { useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch } from 'react-redux';
 import { authenticate, setDidTryAutoLogin } from '../store/authSlice';
-import { getUserDate } from '../utils/actions/userActions';
+import { getUserData } from '../utils/actions/userActions';
 
 export const StartUpScreen = () => {
   const dispatch = useDispatch();
@@ -26,7 +26,7 @@ export const StartUpScreen = () => {
         return;
       }
 
-      const userData = await getUserDate(userId);
+      const userData = await getUserData(userId);
       console.log('StartUpScreen.userData', userData);
       dispatch(authenticate({ token: token, userData }));
     };
