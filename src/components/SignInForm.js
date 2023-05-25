@@ -9,16 +9,18 @@ import { reducer } from '../reducers/formReducer';
 import { signIn } from '../utils/actions/authAction';
 import colors from '../constants/colors';
 
+const isTestMode = true;
+
 const initialState = {
   inputValues: {
-    email: '',
-    password: '',
+    email: isTestMode ? 'test1@test.com' : '',
+    password: isTestMode ? '111111' : '',
   },
   inputValidities: {
-    email: false,
-    password: false,
+    email: isTestMode,
+    password: isTestMode,
   },
-  formIsValid: false,
+  formIsValid: isTestMode,
 };
 
 export const SignInForm = () => {
