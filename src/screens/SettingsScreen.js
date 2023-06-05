@@ -1,22 +1,82 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { PageTitle } from '../components/PageTitle';
+import { PageContainer } from '../components/PageContainer';
+import { Input } from '../components/Input';
+import { Feather, FontAwesome } from '@expo/vector-icons';
+import { useCallback, useReducer } from 'react';
+import { validateInput } from '../utils/actions/formActions';
+import { reducer } from '../reducers/formReducer';
+
+const initialState = {
+  inputValues: {
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+  },
+  inputValidities: {
+    firstName: false,
+    lastName: false,
+    email: false,
+    password: false,
+  },
+  formIsValid: false,
+};
 
 export const SettingsScreen = () => {
+  const [formState, dispatchFormState] = useReducer(reducer, initialState);
+
+  const inputChangedHandler = useCallback(
+    (inputId, inputValue) => {
+      const result = validateInput(inputId, inputValue);
+      dispatchFormState({ inputId, validationResult: result, inputValue });
+    },
+    [dispatchFormState],
+  );
   return (
-    <View style={styles.container}>
-      <Text>Hi SettingsScreen</Text>
-    </View>
+    <PageContainer>
+      <PageTitle text='Settings' />
+      <Input
+        id='firstName'
+        label='First Name'
+        iconName='user-o'
+        IconPack={FontAwesome}
+        iconSize={24}
+        onInputChanged={inputChangedHandler}
+        errorText={formState.inputValidities['firstName']}
+      />
+      <Input
+        id='lastName'
+        label='Last Name'
+        iconName='user-o'
+        IconPack={FontAwesome}
+        iconSize={24}
+        onInputChanged={inputChangedHandler}
+        errorText={formState.inputValidities['lastName']}
+      />
+      <Input
+        id='email'
+        label='Email'
+        iconName='mail'
+        IconPack={Feather}
+        iconSize={24}
+        keyboardType='email-address'
+        autoCapitalize='none'
+        onInputChanged={inputChangedHandler}
+        errorText={formState.inputValidities['email']}
+      />
+      <Input
+        id='about'
+        label='About'
+        iconName='user-o'
+        IconPack={FontAwesome}
+        iconSize={24}
+        onInputChanged={inputChangedHandler}
+        autoCapitalize='none'
+        errorText={formState.inputValidities['about']}
+      />
+    </PageContainer>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  label: {
-    fontSize: 32,
-    fontFamily: 'black',
-  },
-});
+const styles = StyleSheet.create({});
