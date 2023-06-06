@@ -72,6 +72,7 @@ export const SignInForm = () => {
         autoCapitalize='none'
         keyboardType='email-address'
         onInputChanged={inputChangedHandler}
+        initialValue={formState.inputValues.email}
         errorText={formState.inputValidities['email']}
       />
       <Input
@@ -83,6 +84,7 @@ export const SignInForm = () => {
         autoCapitalize='none'
         iconSize={24}
         onInputChanged={inputChangedHandler}
+        initialValue={formState.inputValues.password}
         errorText={formState.inputValidities['password']}
       />
       {isLoading ? (
