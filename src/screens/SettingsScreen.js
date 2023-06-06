@@ -1,33 +1,35 @@
-import { StyleSheet } from 'react-native';
+import { ActivityIndicator, StyleSheet } from 'react-native';
 import { PageTitle } from '../components/PageTitle';
 import { PageContainer } from '../components/PageContainer';
 import { Input } from '../components/Input';
 import { Feather, FontAwesome } from '@expo/vector-icons';
-import { useCallback, useReducer } from 'react';
+import { useCallback, useReducer, useState } from 'react';
 import { validateInput } from '../utils/actions/formActions';
 import { reducer } from '../reducers/formReducer';
 import { useSelector } from 'react-redux';
-
-const initialState = {
-  inputValues: {
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-  },
-  inputValidities: {
-    firstName: false,
-    lastName: false,
-    email: false,
-    password: false,
-  },
-  formIsValid: false,
-};
+import colors from '../constants/colors';
+import { SubmitButton } from '../components/SubmitButton';
 
 export const SettingsScreen = () => {
-  const [formState, dispatchFormState] = useReducer(reducer, initialState);
+  const [isLoading, setIsLoading] = useState(false);
 
   const userData = useSelector((state) => state.auth.userData);
+  const initialState = {
+    inputValues: {
+      firstName: userData.firstName || '',
+      lastName: userData.lastName || '',
+      email: userData.email || '',
+      about: userData.password || '',
+    },
+    inputValidities: {
+      firstName: undefined,
+      lastName: undefined,
+      email: undefined,
+      about: undefined,
+    },
+    formIsValid: false,
+  };
+  const [formState, dispatchFormState] = useReducer(reducer, initialState);
 
   const inputChangedHandler = useCallback(
     (inputId, inputValue) => {
@@ -36,6 +38,10 @@ export const SettingsScreen = () => {
     },
     [dispatchFormState],
   );
+
+  const saveHandler = () => {
+    const updatedValues = formState.inputValues;
+  };
   return (
     <PageContainer>
       <PageTitle text='Settings' />
@@ -82,6 +88,16 @@ export const SettingsScreen = () => {
         errorText={formState.inputValidities['about']}
         initialValue={userData.about}
       />
+      {isLoading ? (
+        <ActivityIndicator size='small' color={colors.primary} />
+      ) : (
+        <SubmitButton
+          title='Save'
+          onPress={saveHandler}
+          style={{ marginTop: 12 }}
+          disabled={!formState?.formIsValid}
+        />
+      )}
     </PageContainer>
   );
 };
