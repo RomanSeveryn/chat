@@ -1,4 +1,10 @@
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { PageTitle } from '../components/PageTitle';
 import { PageContainer } from '../components/PageContainer';
 import { Input } from '../components/Input';
@@ -13,18 +19,25 @@ import {
   updateSignedInUserData,
   userLogout,
 } from '../utils/actions/authAction';
+import { updateLoggedInUserData } from '../store/authSlice';
+import { ProfileImage } from '../components/ProfileImage';
 
 export const SettingsScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const dispatch = useDispatch();
 
   const userData = useSelector((state) => state.auth.userData);
+  const firstName = userData.firstName || '';
+  const lastName = userData.lastName || '';
+  const email = userData.email || '';
+  const about = userData.about || '';
   const initialState = {
     inputValues: {
-      firstName: userData.firstName || '',
-      lastName: userData.lastName || '',
-      email: userData.email || '',
-      about: userData.password || '',
+      firstName,
+      lastName,
+      email,
+      about,
     },
     inputValidities: {
       firstName: undefined,
@@ -50,76 +63,108 @@ export const SettingsScreen = () => {
     try {
       setIsLoading(true);
       await updateSignedInUserData(userData.userId, updatedValues);
+      dispatch(updateLoggedInUserData({ newData: updatedValues }));
+      setShowSuccessMessage(true);
+
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 3000);
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const hasChanges = () => {
+    const currentValues = formState.inputValues;
+
+    return (
+      currentValues.firstName != firstName ||
+      currentValues.lastName != lastName ||
+      currentValues.email != email ||
+      currentValues.about != about
+    );
+  };
   return (
     <PageContainer>
       <PageTitle text='Settings' />
-      <Input
-        id='firstName'
-        label='First Name'
-        iconName='user-o'
-        IconPack={FontAwesome}
-        iconSize={24}
-        onInputChanged={inputChangedHandler}
-        errorText={formState.inputValidities['firstName']}
-        initialValue={userData.firstName}
-      />
-      <Input
-        id='lastName'
-        label='Last Name'
-        iconName='user-o'
-        IconPack={FontAwesome}
-        iconSize={24}
-        onInputChanged={inputChangedHandler}
-        errorText={formState.inputValidities['lastName']}
-        initialValue={userData.lastName}
-      />
-      <Input
-        id='email'
-        label='Email'
-        iconName='mail'
-        IconPack={Feather}
-        iconSize={24}
-        keyboardType='email-address'
-        autoCapitalize='none'
-        onInputChanged={inputChangedHandler}
-        errorText={formState.inputValidities['email']}
-        initialValue={userData.email}
-      />
-      <Input
-        id='about'
-        label='About'
-        iconName='user-o'
-        IconPack={FontAwesome}
-        iconSize={24}
-        onInputChanged={inputChangedHandler}
-        autoCapitalize='none'
-        errorText={formState.inputValidities['about']}
-        initialValue={userData.about}
-      />
-      {isLoading ? (
-        <ActivityIndicator size='small' color={colors.primary} />
-      ) : (
-        <SubmitButton
-          title='Save'
-          onPress={saveHandler}
-          style={{ marginTop: 12 }}
-          disabled={!formState?.formIsValid}
+      <ScrollView contentContainerStyle={styles.formContainer}>
+        <ProfileImage size={80} />
+        <Input
+          id='firstName'
+          label='First Name'
+          iconName='user-o'
+          IconPack={FontAwesome}
+          iconSize={24}
+          onInputChanged={inputChangedHandler}
+          errorText={formState.inputValidities['firstName']}
+          initialValue={userData.firstName}
         />
-      )}
-      <SubmitButton
-        title='Logout'
-        onPress={() => dispatch(userLogout())}
-        style={{ marginTop: 12 }}
-        color={colors.red}
-      />
+        <Input
+          id='lastName'
+          label='Last Name'
+          iconName='user-o'
+          IconPack={FontAwesome}
+          iconSize={24}
+          onInputChanged={inputChangedHandler}
+          errorText={formState.inputValidities['lastName']}
+          initialValue={userData.lastName}
+        />
+        <Input
+          id='email'
+          label='Email'
+          iconName='mail'
+          IconPack={Feather}
+          iconSize={24}
+          keyboardType='email-address'
+          autoCapitalize='none'
+          onInputChanged={inputChangedHandler}
+          errorText={formState.inputValidities['email']}
+          initialValue={userData.email}
+        />
+        <Input
+          id='about'
+          label='About'
+          iconName='user-o'
+          IconPack={FontAwesome}
+          iconSize={24}
+          onInputChanged={inputChangedHandler}
+          autoCapitalize='none'
+          errorText={formState.inputValidities['about']}
+          initialValue={userData.about}
+        />
+        <View style={{ marginTop: 20 }}>
+          {showSuccessMessage && <Text>Saved!</Text>}
+          {isLoading ? (
+            <ActivityIndicator size='small' color={colors.primary} />
+          ) : (
+            hasChanges() && (
+              <SubmitButton
+                title='Save'
+                onPress={saveHandler}
+                style={{ marginTop: 20 }}
+                disabled={!formState?.formIsValid}
+              />
+            )
+          )}
+        </View>
+        <SubmitButton
+          title='Logout'
+          onPress={() => dispatch(userLogout())}
+          style={{ marginTop: 12 }}
+          color={colors.red}
+        />
+      </ScrollView>
     </PageContainer>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  formContainer: {
+    alignItems: 'center',
+  },
+});
