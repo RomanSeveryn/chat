@@ -90,7 +90,11 @@ export const SettingsScreen = () => {
     <PageContainer>
       <PageTitle text='Settings' />
       <ScrollView contentContainerStyle={styles.formContainer}>
-        <ProfileImage size={80} />
+        <ProfileImage
+          size={80}
+          userId={userData.userId}
+          uri={userData.profilePicture}
+        />
         <Input
           id='firstName'
           label='First Name'

@@ -7,8 +7,9 @@ import {
   uploadImageAsync,
 } from '../utils/imagePickerHelper';
 import { useState } from 'react';
+import { updateSignedInUserData } from '../utils/actions/authAction';
 
-export const ProfileImage = ({ size, uri }) => {
+export const ProfileImage = ({ size, uri, userId }) => {
   const source = uri ? { uri: uri } : userImage;
   const [image, setImage] = useState(source);
   const pickImage = async () => {
@@ -22,6 +23,8 @@ export const ProfileImage = ({ size, uri }) => {
       if (!uploadUrl) {
         throw new Error('Could not upload image');
       }
+
+      await updateSignedInUserData(userId, { profilePicture: uploadUrl });
 
       setImage({ uri: uploadUrl });
     } catch (error) {
