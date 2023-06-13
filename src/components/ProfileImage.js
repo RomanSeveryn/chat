@@ -2,7 +2,10 @@ import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import userImage from '../../assets/images/userImage.jpeg';
 import colors from '../constants/colors';
-import { launchImagePicker } from '../utils/imagePickerHelper';
+import {
+  launchImagePicker,
+  uploadImageAsync,
+} from '../utils/imagePickerHelper';
 import { useState } from 'react';
 
 export const ProfileImage = ({ size, uri }) => {
@@ -11,10 +14,18 @@ export const ProfileImage = ({ size, uri }) => {
   const pickImage = async () => {
     try {
       const tempUri = await launchImagePicker();
+
       if (!tempUri) return;
-      setImage({ uri: tempUri });
-    } catch (e) {
-      console.log('pickImage.e', e);
+
+      const uploadUrl = await uploadImageAsync(tempUri);
+
+      if (!uploadUrl) {
+        throw new Error('Could not upload image');
+      }
+
+      setImage({ uri: uploadUrl });
+    } catch (error) {
+      console.log(error);
     }
   };
   return (
