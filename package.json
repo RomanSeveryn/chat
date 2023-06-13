@@ -28,7 +28,8 @@
     "react-native-screens": "~3.20.0",
     "react-native-web": "~0.18.11",
     "react-redux": "^8.0.5",
-    "validate.js": "^0.13.1"
+    "validate.js": "^0.13.1",
+    "expo-image-picker": "~14.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
