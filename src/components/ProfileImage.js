@@ -8,8 +8,11 @@ import {
 } from '../utils/imagePickerHelper';
 import { useState } from 'react';
 import { updateSignedInUserData } from '../utils/actions/authAction';
+import { useDispatch } from 'react-redux';
+import { updateLoggedInUserData } from '../store/authSlice';
 
 export const ProfileImage = ({ size, uri, userId }) => {
+  const dispatch = useDispatch();
   const source = uri ? { uri: uri } : userImage;
   const [image, setImage] = useState(source);
   const pickImage = async () => {
@@ -24,7 +27,10 @@ export const ProfileImage = ({ size, uri, userId }) => {
         throw new Error('Could not upload image');
       }
 
-      await updateSignedInUserData(userId, { profilePicture: uploadUrl });
+      const newData = { profilePicture: uploadUrl };
+
+      await updateSignedInUserData(userId, newData);
+      dispatch(updateLoggedInUserData({ newData }));
 
       setImage({ uri: uploadUrl });
     } catch (error) {
