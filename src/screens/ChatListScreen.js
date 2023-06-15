@@ -12,7 +12,7 @@ export const ChatListScreen = ({ navigation }) => {
             <Item
               title='New chat'
               iconName='create-outline'
-              onPress={() => {}}
+              onPress={() => navigation.navigate('NewChat')}
             />
           </HeaderButtons>
         );
