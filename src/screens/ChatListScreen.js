@@ -1,6 +1,24 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import { CustomHeaderButton } from '../components/CustomHeaderButton';
 
 export const ChatListScreen = ({ navigation }) => {
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => {
+        return (
+          <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+            <Item
+              title='New chat'
+              iconName='create-outline'
+              onPress={() => {}}
+            />
+          </HeaderButtons>
+        );
+      },
+    });
+  }, [navigation]);
   return (
     <View style={styles.container}>
       <Text>Hi ChatListScreen</Text>
@@ -18,7 +36,6 @@ export const ChatListScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
