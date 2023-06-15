@@ -6,11 +6,13 @@ import { FontAwesome } from '@expo/vector-icons';
 import { PageContainer } from '../components/PageContainer';
 import colors from '../constants/colors';
 import commonStyles from '../constants/commonStyles';
+import { searchUsers } from '../utils/actions/userActions';
 
 export const NewChatScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [noResultsFound, setNoResultsFound] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     navigation.setOptions({
@@ -25,6 +27,22 @@ export const NewChatScreen = ({ navigation }) => {
     });
   }, []);
 
+  useEffect(() => {
+    const delaySearch = setTimeout(async () => {
+      if (!searchTerm || searchTerm === '') {
+        setUsers();
+        setNoResultsFound(false);
+        return;
+      }
+
+      setIsLoading(true);
+      const userResult = await searchUsers(searchTerm);
+      console.log('userResult', userResult);
+      setIsLoading(false);
+    }, 500);
+    return () => clearTimeout(delaySearch);
+  }, [searchTerm]);
+
   return (
     <PageContainer>
       <View style={styles.searchContainer}>
@@ -32,7 +50,7 @@ export const NewChatScreen = ({ navigation }) => {
         <TextInput
           placeholder='Search'
           style={styles.searchBox}
-          onChangeText={() => {}}
+          onChangeText={(text) => setSearchTerm(text)}
         />
       </View>
       {!isLoading && !users && (
