@@ -17,7 +17,7 @@ import { updateSignedInUserData } from '../utils/actions/authAction';
 import { useDispatch } from 'react-redux';
 import { updateLoggedInUserData } from '../store/authSlice';
 
-export const ProfileImage = ({ size, uri, userId }) => {
+export const ProfileImage = ({ size, uri, userId, showEditButton }) => {
   const dispatch = useDispatch();
   const source = uri ? { uri: uri } : userImage;
   const [image, setImage] = useState(source);
@@ -48,8 +48,10 @@ export const ProfileImage = ({ size, uri, userId }) => {
       setIsLoading(false);
     }
   };
+
+  const Container = showEditButton ? TouchableOpacity : View;
   return (
-    <TouchableOpacity onPress={pickImage}>
+    <Container onPress={pickImage}>
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size='small' color={colors.primary} />
@@ -61,10 +63,12 @@ export const ProfileImage = ({ size, uri, userId }) => {
         />
       )}
 
-      <View style={styles.editIconContainer}>
-        <FontAwesome name='pencil' size={16} color='black' />
-      </View>
-    </TouchableOpacity>
+      {!isLoading && showEditButton && (
+        <View style={styles.editIconContainer}>
+          <FontAwesome name='pencil' size={16} color='black' />
+        </View>
+      )}
+    </Container>
   );
 };
 
