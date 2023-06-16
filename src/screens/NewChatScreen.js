@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TextInput, Text } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  Text,
+  ActivityIndicator,
+  FlatList,
+} from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { CustomHeaderButton } from '../components/CustomHeaderButton';
 import { FontAwesome } from '@expo/vector-icons';
@@ -7,6 +14,7 @@ import { PageContainer } from '../components/PageContainer';
 import colors from '../constants/colors';
 import commonStyles from '../constants/commonStyles';
 import { searchUsers } from '../utils/actions/userActions';
+import { DataItem } from '../components/DataItem';
 
 export const NewChatScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +45,13 @@ export const NewChatScreen = ({ navigation }) => {
 
       setIsLoading(true);
       const userResult = await searchUsers(searchTerm);
-      console.log('userResult', userResult);
+      setUsers(userResult);
+
+      if (Object.keys(userResult).length === 0) {
+        setNoResultsFound(true);
+      } else {
+        setNoResultsFound(false);
+      }
       setIsLoading(false);
     }, 500);
     return () => clearTimeout(delaySearch);
@@ -53,6 +67,28 @@ export const NewChatScreen = ({ navigation }) => {
           onChangeText={(text) => setSearchTerm(text)}
         />
       </View>
+      {!isLoading && !noResultsFound && users && (
+        <FlatList
+          data={Object.keys(users)}
+          renderItem={(itemData) => {
+            const userId = itemData.item;
+            const userData = users[userId];
+
+            return (
+              <DataItem
+                title={`${userData.firstName} ${userData.lastName}`}
+                subTitle={userData.about}
+                image={userData.profilePicture}
+              />
+            );
+          }}
+        />
+      )}
+      {isLoading && (
+        <View style={commonStyles.center}>
+          <ActivityIndicator size='large' color={colors.primary} />
+        </View>
+      )}
       {!isLoading && !users && (
         <View style={commonStyles.center}>
           <FontAwesome

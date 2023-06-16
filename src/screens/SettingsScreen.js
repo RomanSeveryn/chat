@@ -94,6 +94,7 @@ export const SettingsScreen = () => {
           size={80}
           userId={userData.userId}
           uri={userData.profilePicture}
+          showEditButton={true}
         />
         <Input
           id='firstName'
