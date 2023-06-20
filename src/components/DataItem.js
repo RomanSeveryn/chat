@@ -2,11 +2,9 @@ import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { ProfileImage } from './ProfileImage';
 import colors from '../constants/colors';
 
-export const DataItem = (props) => {
-  const { title, subTitle, image } = props;
-
+export const DataItem = ({ title, subTitle, image, onPress }) => {
   return (
-    <TouchableWithoutFeedback>
+    <TouchableWithoutFeedback onPress={onPress}>
       <View style={styles.container}>
         <ProfileImage uri={image} size={40} />
 
