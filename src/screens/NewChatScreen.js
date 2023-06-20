@@ -15,12 +15,18 @@ import colors from '../constants/colors';
 import commonStyles from '../constants/commonStyles';
 import { searchUsers } from '../utils/actions/userActions';
 import { DataItem } from '../components/DataItem';
+import { useDispatch, useSelector } from 'react-redux';
+import { setStoredUsers } from '../store/userSlice';
 
 export const NewChatScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
+
   const [isLoading, setIsLoading] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [noResultsFound, setNoResultsFound] = useState(true);
+  const [users, setUsers] = useState();
+  const [noResultsFound, setNoResultsFound] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const userData = useSelector((state) => state.auth.userData);
 
   useEffect(() => {
     navigation.setOptions({
@@ -44,18 +50,30 @@ export const NewChatScreen = ({ navigation }) => {
       }
 
       setIsLoading(true);
-      const userResult = await searchUsers(searchTerm);
-      setUsers(userResult);
 
-      if (Object.keys(userResult).length === 0) {
+      const usersResult = await searchUsers(searchTerm);
+      delete usersResult[userData.userId];
+      setUsers(usersResult);
+
+      if (Object.keys(usersResult).length === 0) {
         setNoResultsFound(true);
       } else {
         setNoResultsFound(false);
+
+        dispatch(setStoredUsers({ newUsers: usersResult }));
       }
+
       setIsLoading(false);
     }, 500);
+
     return () => clearTimeout(delaySearch);
   }, [searchTerm]);
+
+  const userPressed = (userId) => {
+    navigation.navigate('ChatList', {
+      selectedUserId: userId,
+    });
+  };
 
   return (
     <PageContainer>
@@ -67,6 +85,13 @@ export const NewChatScreen = ({ navigation }) => {
           onChangeText={(text) => setSearchTerm(text)}
         />
       </View>
+
+      {isLoading && (
+        <View style={commonStyles.center}>
+          <ActivityIndicator size={'large'} color={colors.primary} />
+        </View>
+      )}
+
       {!isLoading && !noResultsFound && users && (
         <FlatList
           data={Object.keys(users)}
@@ -79,16 +104,25 @@ export const NewChatScreen = ({ navigation }) => {
                 title={`${userData.firstName} ${userData.lastName}`}
                 subTitle={userData.about}
                 image={userData.profilePicture}
+                onPress={() => userPressed(userId)}
               />
             );
           }}
         />
       )}
-      {isLoading && (
+
+      {!isLoading && noResultsFound && (
         <View style={commonStyles.center}>
-          <ActivityIndicator size='large' color={colors.primary} />
+          <FontAwesome
+            name='question'
+            size={55}
+            color={colors.lightGrey}
+            style={styles.noResultsIcon}
+          />
+          <Text style={styles.noResultsText}>No users found!</Text>
         </View>
       )}
+
       {!isLoading && !users && (
         <View style={commonStyles.center}>
           <FontAwesome
@@ -100,17 +134,6 @@ export const NewChatScreen = ({ navigation }) => {
           <Text style={styles.noResultsText}>
             Enter a name to search for a user!
           </Text>
-        </View>
-      )}
-      {!isLoading && noResultsFound && (
-        <View style={commonStyles.center}>
-          <FontAwesome
-            name='question'
-            size={55}
-            color={colors.lightGrey}
-            style={styles.noResultsIcon}
-          />
-          <Text style={styles.noResultsText}>No users found!</Text>
         </View>
       )}
     </PageContainer>

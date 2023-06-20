@@ -11,14 +11,36 @@ import backgroundImage from '../../assets/images/green-nature-background.jpg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import colors from '../constants/colors';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-export const ChatScreen = () => {
+export const ChatScreen = ({ navigation, route }) => {
   const [messageText, setMessageText] = useState('');
+  const [chatUsers, setChatUsers] = useState([]);
+  const storedUsers = useSelector((state) => state.users.storedUsers);
+  const userData = useSelector((state) => state.auth.userData);
+
+  const chatData = route?.params?.newChatData;
 
   const sendMessage = useCallback(() => {
     setMessageText('');
   }, [messageText]);
+
+  const getChatTitleFromName = () => {
+    const otherUserId = chatUsers.find((uid) => uid !== userData.userId);
+    const otherUserData = storedUsers[otherUserId];
+
+    return (
+      otherUserData && `${otherUserData.firstName} ${otherUserData.lastName}`
+    );
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: getChatTitleFromName(),
+    });
+    setChatUsers(chatData.users);
+  }, [chatUsers]);
 
   return (
     <SafeAreaView style={styles.container} edges={['right', 'left', 'bottom']}>
