@@ -7,18 +7,87 @@ import { SettingsScreen } from '../screens/SettingsScreen';
 import { ChatScreen } from '../screens/ChatScreen';
 import { NewChatScreen } from '../screens/NewChatScreen';
 import { useDispatch, useSelector } from 'react-redux';
-import { child, getDatabase, onValue, ref, off } from 'firebase/database';
+import { child, getDatabase, onValue, ref, off, get } from 'firebase/database';
 import { useEffect, useState } from 'react';
 import { getFirebaseApp } from '../utils/firebaseHalper';
 import { setChatsData } from '../store/chatSlice';
 import { ActivityIndicator, View } from 'react-native';
 import colors from '../constants/colors';
 import commonStyles from '../constants/commonStyles';
+import { setStoredUsers } from '../store/userSlice';
+
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const TabNavigator = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerTitle: '',
+        headerShadowVisible: false,
+      }}
+    >
+      <Tab.Screen
+        name='ChatList'
+        component={ChatListScreen}
+        options={{
+          tabBarLabel: 'Chats',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name='chatbubble-outline' size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name='Settings'
+        component={SettingsScreen}
+        options={{
+          tabBarLabel: 'Settings',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name='settings-outline' size={size} color={color} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
+};
+
+const StackNavigator = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Group>
+        <Stack.Screen
+          name='Home'
+          component={TabNavigator}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name='ChatScreen'
+          component={ChatScreen}
+          options={{
+            headerTitle: '',
+            headerBackTitle: 'Back',
+          }}
+        />
+        <Stack.Screen
+          name='ChatSettings'
+          component={ChatSettingsScreen}
+          options={{
+            headerTitle: 'Settings',
+            headerBackTitle: 'Back',
+          }}
+        />
+      </Stack.Group>
+
+      <Stack.Group screenOptions={{ presentation: 'containedModal' }}>
+        <Stack.Screen name='NewChat' component={NewChatScreen} />
+      </Stack.Group>
+    </Stack.Navigator>
+  );
+};
 
 export const MainNavigator = () => {
-  const Stack = createNativeStackNavigator();
-  const Tab = createBottomTabNavigator();
   const dispatch = useDispatch();
+
   const [isLoading, setIsLoading] = useState(true);
 
   const userData = useSelector((state) => state.auth.userData);
@@ -52,6 +121,19 @@ export const MainNavigator = () => {
           if (data) {
             data.key = chatSnapshot.key;
 
+            data.users.forEach((userId) => {
+              if (storedUsers[userId]) return;
+
+              const userRef = child(dbRef, `users/${userId}`);
+
+              get(userRef).then((userSnapshot) => {
+                const userSnapshotData = userSnapshot.val();
+                dispatch(setStoredUsers({ newUsers: { userSnapshotData } }));
+              });
+
+              refs.push(userRef);
+            });
+
             chatsData[chatSnapshot.key] = data;
           }
 
@@ -61,89 +143,22 @@ export const MainNavigator = () => {
           }
         });
 
-        if (chatsFoundCount === 0) {
+        if (chatsFoundCount == 0) {
           setIsLoading(false);
         }
       }
     });
 
     return () => {
-      console.log('Unsubscribing to firebase listeners');
-
+      console.log('Unsubscribing firebase listeners');
       refs.forEach((ref) => off(ref));
     };
   }, []);
 
-  const TabNavigator = () => {
-    return (
-      <Tab.Navigator
-        screenOptions={{
-          headerTitle: '',
-          headerShadowVisible: false,
-        }}
-      >
-        <Tab.Screen
-          name='ChatList'
-          component={ChatListScreen}
-          options={{
-            tabBarLabel: 'Chats',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name='chatbubble-outline' size={size} color={color} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name='Settings'
-          component={SettingsScreen}
-          options={{
-            tabBarLabel: 'Settings',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name='settings-outline' size={size} color={color} />
-            ),
-          }}
-        />
-      </Tab.Navigator>
-    );
-  };
-
-  const StackNavigator = () => {
-    return (
-      <Stack.Navigator>
-        <Stack.Group>
-          <Stack.Screen
-            name='Home'
-            component={TabNavigator}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name='ChatScreen'
-            component={ChatScreen}
-            options={{
-              headerTitle: '',
-              headerBackTitle: 'Back',
-            }}
-          />
-          <Stack.Screen
-            name='ChatSettings'
-            component={ChatSettingsScreen}
-            options={{
-              headerTitle: 'Settings',
-              headerBackTitle: 'Back',
-            }}
-          />
-        </Stack.Group>
-
-        <Stack.Group screenOptions={{ presentation: 'containedModal' }}>
-          <Stack.Screen name='NewChat' component={NewChatScreen} />
-        </Stack.Group>
-      </Stack.Navigator>
-    );
-  };
-
   if (isLoading) {
     return (
       <View style={commonStyles.center}>
-        <ActivityIndicator size='large' color={colors.primary} />
+        <ActivityIndicator size={'large'} color={colors.primary} />
       </View>
     );
   }
