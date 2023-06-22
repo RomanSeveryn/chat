@@ -1,13 +1,24 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
 import React, { useEffect } from 'react';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { CustomHeaderButton } from '../components/CustomHeaderButton';
 import { useSelector } from 'react-redux';
+import { DataItem } from '../components/DataItem';
+import { PageContainer } from '../components/PageContainer';
+import { PageTitle } from '../components/PageTitle';
 
 export const ChatListScreen = ({ navigation, route }) => {
   const selectedUser = route?.params?.selectedUserId;
 
   const userData = useSelector((state) => state.auth.userData);
+  const storedUsers = useSelector((state) => state.users.storedUsers);
+
+  const userChats = useSelector((state) => {
+    const chatsData = state.chats.chatsData;
+    return Object.values(chatsData).sort((a, b) => {
+      return new Date(b.updatedAt) - new Date(a.updatedAt);
+    });
+  });
 
   useEffect(() => {
     navigation.setOptions({
@@ -34,16 +45,29 @@ export const ChatListScreen = ({ navigation, route }) => {
     navigation.navigate('ChatScreen', navigationProps);
   }, [route?.params]);
   return (
-    <View style={styles.container}>
-      <Text>Hi ChatListScreen</Text>
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate('ChatScreen');
+    <PageContainer>
+      <PageTitle text='Chats' />
+
+      <FlatList
+        data={userChats}
+        renderItem={(itemData) => {
+          const chatData = itemData.item;
+
+          const otherUserId = chatData.users.find(
+            (uid) => uid !== userData.userId,
+          );
+          const otherUser = storedUsers[otherUserId];
+
+          if (!otherUser) return;
+
+          const title = `${otherUser.firstName} ${otherUser.lastName}`;
+          const subTitle = 'This will be a message..';
+          const image = otherUser.profilePicture;
+
+          return <DataItem title={title} subTitle={subTitle} image={image} />;
         }}
-      >
-        <Text>Go to Chat screen</Text>
-      </TouchableOpacity>
-    </View>
+      />
+    </PageContainer>
   );
 };
 
