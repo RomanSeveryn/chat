@@ -15,6 +15,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { PageContainer } from '../components/PageContainer';
 import { Bubble } from '../components/Bubble';
+import { createChat } from '../utils/actions/chatActions';
 
 export const ChatScreen = ({ navigation, route }) => {
   const [messageText, setMessageText] = useState('');
@@ -25,9 +26,17 @@ export const ChatScreen = ({ navigation, route }) => {
 
   const chatData = route?.params?.newChatData;
 
-  const sendMessage = useCallback(() => {
+  const sendMessage = useCallback(async () => {
+    try {
+      let id = chatId;
+      if (!id) {
+        id = await createChat(userData.userId, route.params.newChatData);
+        setChatId(id);
+      }
+    } catch (error) {}
+
     setMessageText('');
-  }, [messageText]);
+  }, [messageText, chatId]);
 
   const getChatTitleFromName = () => {
     const otherUserId = chatUsers.find((uid) => uid !== userData.userId);
