@@ -6,14 +6,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { ChatScreen } from '../screens/ChatScreen';
 import { NewChatScreen } from '../screens/NewChatScreen';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { child, getDatabase, onValue, ref, off } from 'firebase/database';
 import { useEffect } from 'react';
 import { getFirebaseApp } from '../utils/firebaseHalper';
+import { setChatsData } from '../store/chatSlice';
 
 export const MainNavigator = () => {
   const Stack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
+  const dispatch = useDispatch();
 
   const userData = useSelector((state) => state.auth.userData);
   const storedUsers = useSelector((state) => state.users.storedUsers);
@@ -30,7 +32,30 @@ export const MainNavigator = () => {
       const chatIdsData = querySnapshot.val() || {};
       const chatIds = Object.values(chatIdsData);
 
-      console.log(chatIds);
+      const chatsData = {};
+      let chatsFoundCount = 0;
+
+      for (let i = 0; i < chatIds.length; i++) {
+        const chatId = chatIds[i];
+        const chatRef = child(dbRef, `chats/${chatId}`);
+        refs.push(chatRef);
+
+        onValue(chatRef, (chatSnapshot) => {
+          chatsFoundCount++;
+
+          const data = chatSnapshot.val();
+
+          if (data) {
+            data.key = chatSnapshot.key;
+
+            chatsData[chatSnapshot.key] = data;
+          }
+
+          if (chatsFoundCount >= chatIds.length) {
+            dispatch(setChatsData({ chatsData }));
+          }
+        });
+      }
     });
 
     return () => {
