@@ -15,7 +15,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { PageContainer } from '../components/PageContainer';
 import { Bubble } from '../components/Bubble';
-import { createChat } from '../utils/actions/chatActions';
+import { createChat, sendTextMessage } from '../utils/actions/chatActions';
 
 export const ChatScreen = ({ navigation, route }) => {
   const [messageText, setMessageText] = useState('');
@@ -35,6 +35,8 @@ export const ChatScreen = ({ navigation, route }) => {
         id = await createChat(userData.userId, route.params.newChatData);
         setChatId(id);
       }
+
+      await sendTextMessage(chatId, userData.userId, messageText);
     } catch (error) {}
 
     setMessageText('');
