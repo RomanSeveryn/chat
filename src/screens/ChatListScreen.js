@@ -52,6 +52,7 @@ export const ChatListScreen = ({ navigation, route }) => {
         data={userChats}
         renderItem={(itemData) => {
           const chatData = itemData.item;
+          const chatId = chatData.key;
 
           const otherUserId = chatData.users.find(
             (uid) => uid !== userData.userId,
@@ -64,7 +65,14 @@ export const ChatListScreen = ({ navigation, route }) => {
           const subTitle = 'This will be a message..';
           const image = otherUser.profilePicture;
 
-          return <DataItem title={title} subTitle={subTitle} image={image} />;
+          return (
+            <DataItem
+              title={title}
+              subTitle={subTitle}
+              image={image}
+              onPress={() => navigation.navigate('ChatScreen', { chatId })}
+            />
+          );
         }}
       />
     </PageContainer>

@@ -23,8 +23,10 @@ export const ChatScreen = ({ navigation, route }) => {
   const [chatId, setChatId] = useState(route?.params?.chatId);
   const storedUsers = useSelector((state) => state.users.storedUsers);
   const userData = useSelector((state) => state.auth.userData);
+  const storedChats = useSelector((state) => state.chats.chatsData);
 
-  const chatData = route?.params?.newChatData;
+  const chatData =
+    (chatId && storedChats[chatId]) || route?.params?.newChatData;
 
   const sendMessage = useCallback(async () => {
     try {
