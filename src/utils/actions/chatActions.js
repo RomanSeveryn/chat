@@ -1,4 +1,4 @@
-import { child, getDatabase, push, ref } from 'firebase/database';
+import { child, getDatabase, push, ref, update } from 'firebase/database';
 import { getFirebaseApp } from '../firebaseHalper';
 
 export const createChat = async (loggedInUserId, chatData) => {
@@ -35,4 +35,11 @@ export const sendTextMessage = async (chatId, senderId, messageText) => {
   };
 
   await push(messagesRef, messageData);
+
+  const chatRef = child(dbRef, `chats/${chatId}`);
+  await update(chatRef, {
+    updatedBy: senderId,
+    updatedAt: new Date().toISOString(),
+    latestMessageText: messageText,
+  });
 };
