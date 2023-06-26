@@ -25,7 +25,17 @@ export const ChatScreen = ({ navigation, route }) => {
   const storedUsers = useSelector((state) => state.users.storedUsers);
   const userData = useSelector((state) => state.auth.userData);
   const storedChats = useSelector((state) => state.chats.chatsData);
-  const chatMessages = useSelector((state) => state.messages.messagesData);
+  const chatMessages = useSelector((state) => {
+    if (!chatId) return [];
+    const chatMessagesData = state.messages.messagesData[chatId];
+    if (!chatMessagesData) return [];
+    const messageList = [];
+    for (const key in chatMessagesData) {
+      const message = chatMessagesData[key];
+      messageList.push({ key, ...message });
+    }
+    return messageList;
+  });
 
   const chatData =
     (chatId && storedChats[chatId]) || route?.params?.newChatData;
