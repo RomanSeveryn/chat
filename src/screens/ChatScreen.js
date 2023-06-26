@@ -6,6 +6,7 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
+  FlatList,
 } from 'react-native';
 import backgroundImage from '../../assets/images/green-nature-background.jpg';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -90,6 +91,19 @@ export const ChatScreen = ({ navigation, route }) => {
             )}
             {errorBannerText !== '' && (
               <Bubble text={errorBannerText} type='error' />
+            )}
+            {chatId && (
+              <FlatList
+                data={chatMessages}
+                renderItem={(itemData) => {
+                  const message = itemData.item;
+                  const isOwnMessage = message.sentBy === userData.userId;
+                  const messageType = isOwnMessage
+                    ? 'myMessage'
+                    : 'theirMessage';
+                  return <Bubble text={message.text} type={messageType} />;
+                }}
+              />
             )}
           </PageContainer>
         </ImageBackground>

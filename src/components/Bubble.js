@@ -4,6 +4,7 @@ import colors from '../constants/colors';
 export const Bubble = ({ text, type }) => {
   const bubbleStyle = { ...styles.container };
   const textStyle = { ...styles.text };
+  const wrapperStyle = { ...styles.wrapperStyle };
 
   switch (type) {
     case 'system':
@@ -18,13 +19,23 @@ export const Bubble = ({ text, type }) => {
       bubbleStyle.backgroundColor = colors.red;
       bubbleStyle.marginTop = 10;
       break;
+    case 'myMessage':
+      wrapperStyle.justifyContent = 'flex-end';
+      bubbleStyle.backgroundColor = '#E7FED6';
+      bubbleStyle.maxWidth = '90%';
+      break;
+
+    case 'theirMessage':
+      wrapperStyle.justifyContent = 'flex-start';
+      bubbleStyle.maxWidth = '90%';
+      break;
 
     default:
       break;
   }
 
   return (
-    <View style={styles.wrapperStyle}>
+    <View style={wrapperStyle}>
       <View style={bubbleStyle}>
         <Text style={textStyle}>{text}</Text>
       </View>
