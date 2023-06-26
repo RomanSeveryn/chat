@@ -13,6 +13,12 @@ export const Bubble = ({ text, type }) => {
       bubbleStyle.marginTop = 10;
       break;
 
+    case 'error':
+      textStyle.color = 'white';
+      bubbleStyle.backgroundColor = colors.red;
+      bubbleStyle.marginTop = 10;
+      break;
+
     default:
       break;
   }
