@@ -7,7 +7,21 @@ import {
   MenuTrigger,
 } from 'react-native-popup-menu';
 import uuid from 'react-native-uuid';
+import * as Clipboard from 'expo-clipboard';
 import colors from '../constants/colors';
+import { Feather, FontAwesome } from '@expo/vector-icons';
+
+const MenuItem = ({ text, onSelect, iconPack, icon }) => {
+  const Icon = iconPack ?? Feather;
+  return (
+    <MenuOption onSelect={onSelect}>
+      <View style={styles.menuItemContainer}>
+        <Text style={styles.menuText}>{text}</Text>
+        <Icon name={icon} size={18} />
+      </View>
+    </MenuOption>
+  );
+};
 
 export const Bubble = ({ text, type }) => {
   const menuRef = useRef(null);
@@ -47,6 +61,14 @@ export const Bubble = ({ text, type }) => {
       break;
   }
 
+  const copyToClipboard = async (text) => {
+    try {
+      await Clipboard.setStringAsync(text);
+    } catch (e) {
+      console.log('copyToClipboard.e', e);
+    }
+  };
+
   return (
     <View style={wrapperStyle}>
       <Container
@@ -60,11 +82,17 @@ export const Bubble = ({ text, type }) => {
           <Menu name={id.current} ref={menuRef}>
             <MenuTrigger />
             <MenuOptions>
-              <MenuOption text='1' />
-              <MenuOption text='2' />
-              <MenuOption text='3' />
-              <MenuOption />
-              <MenuOption />
+              <MenuItem
+                icon='copy'
+                text='Copy to clipboard'
+                onSelect={() => copyToClipboard(text)}
+              />
+              <MenuItem
+                icon='star-o'
+                iconPack={FontAwesome}
+                text='Start message'
+                onSelect={() => copyToClipboard(text)}
+              />
             </MenuOptions>
           </Menu>
         </View>
@@ -87,6 +115,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   text: {
+    fontFamily: 'regular',
+    letterSpacing: 0.3,
+  },
+  menuItemContainer: {
+    flexDirection: 'row',
+    padding: 5,
+  },
+  menuText: {
+    flex: 1,
+    fontSize: 16,
     fontFamily: 'regular',
     letterSpacing: 0.3,
   },
