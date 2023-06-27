@@ -156,6 +156,9 @@ export const MainNavigator = () => {
           setIsLoading(false);
         }
       }
+      if (chatsFoundCount == 0) {
+        setIsLoading(false);
+      }
     });
 
     return () => {
