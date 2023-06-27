@@ -106,7 +106,7 @@ export const updateSignedInUserData = async (userId, newData) => {
 };
 
 const createUser = async (firstName, lastName, email, userId) => {
-  const firstLast = `${firstName} ${lastName}`;
+  const firstLast = `${firstName} ${lastName}`.toLowerCase();
   const userData = {
     firstName,
     lastName,
