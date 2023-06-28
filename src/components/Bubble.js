@@ -13,6 +13,17 @@ import { Feather, FontAwesome } from '@expo/vector-icons';
 import { starMessage } from '../utils/actions/chatActions';
 import { useSelector } from 'react-redux';
 
+function formatAmPm(dateString) {
+  const date = new Date(dateString);
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  let ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0' + minutes : minutes;
+  return hours + ':' + minutes + ' ' + ampm;
+}
+
 const MenuItem = ({ text, onSelect, iconPack, icon }) => {
   const Icon = iconPack ?? Feather;
   return (
@@ -25,18 +36,19 @@ const MenuItem = ({ text, onSelect, iconPack, icon }) => {
   );
 };
 
-export const Bubble = ({ text, type, messageId, userId, chatId }) => {
+export const Bubble = ({ text, type, messageId, userId, chatId, date }) => {
   const starredMessages = useSelector(
     (state) => state.messages.starredMessages[chatId] || {},
   );
 
-  console.log('starredMessages', starredMessages);
   const menuRef = useRef(null);
   const id = useRef(uuid.v4());
   const bubbleStyle = { ...styles.container };
   const textStyle = { ...styles.text };
   const wrapperStyle = { ...styles.wrapperStyle };
   let Container = View;
+  let isUserMessage = false;
+  const dateString = formatAmPm(date);
 
   switch (type) {
     case 'system':
@@ -56,12 +68,14 @@ export const Bubble = ({ text, type, messageId, userId, chatId }) => {
       bubbleStyle.backgroundColor = '#E7FED6';
       bubbleStyle.maxWidth = '90%';
       Container = TouchableWithoutFeedback;
+      isUserMessage = true;
       break;
 
     case 'theirMessage':
       wrapperStyle.justifyContent = 'flex-start';
       bubbleStyle.maxWidth = '90%';
       Container = TouchableWithoutFeedback;
+      isUserMessage = true;
       break;
 
     default:
@@ -76,6 +90,8 @@ export const Bubble = ({ text, type, messageId, userId, chatId }) => {
     }
   };
 
+  const isStarred = isUserMessage && starredMessages[messageId] !== undefined;
+
   return (
     <View style={wrapperStyle}>
       <Container
@@ -86,6 +102,21 @@ export const Bubble = ({ text, type, messageId, userId, chatId }) => {
       >
         <View style={bubbleStyle}>
           <Text style={textStyle}>{text}</Text>
+
+          {dateString && (
+            <View style={styles.timeContainer}>
+              {isStarred && (
+                <FontAwesome
+                  name='star'
+                  size={14}
+                  color={colors.textColor}
+                  style={{ marginRight: 5 }}
+                />
+              )}
+              <Text style={styles.time}>{dateString}</Text>
+            </View>
+          )}
+
           <Menu name={id.current} ref={menuRef}>
             <MenuTrigger />
             <MenuOptions>
@@ -95,9 +126,9 @@ export const Bubble = ({ text, type, messageId, userId, chatId }) => {
                 onSelect={() => copyToClipboard(text)}
               />
               <MenuItem
-                icon='star-o'
+                icon={`${isStarred ? 'star-o' : 'star'}`}
                 iconPack={FontAwesome}
-                text='Star message'
+                text={`${isStarred ? 'Unstar' : 'Star'} message`}
                 onSelect={() => starMessage(messageId, chatId, userId)}
               />
             </MenuOptions>
@@ -133,6 +164,16 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontFamily: 'regular',
+    letterSpacing: 0.3,
+  },
+  timeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  time: {
+    fontFamily: 'regular',
+    fontSize: 12,
+    color: colors.grey,
     letterSpacing: 0.3,
   },
 });

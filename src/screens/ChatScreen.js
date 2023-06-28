@@ -108,6 +108,7 @@ export const ChatScreen = ({ navigation, route }) => {
                       messageId={message.key}
                       userId={userData.userId}
                       chatId={chatId}
+                      date={message.sentAt}
                     />
                   );
                 }}
