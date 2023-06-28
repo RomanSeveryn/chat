@@ -101,7 +101,15 @@ export const ChatScreen = ({ navigation, route }) => {
                   const messageType = isOwnMessage
                     ? 'myMessage'
                     : 'theirMessage';
-                  return <Bubble text={message.text} type={messageType} />;
+                  return (
+                    <Bubble
+                      text={message.text}
+                      type={messageType}
+                      messageId={message.key}
+                      userId={userData.userId}
+                      chatId={chatId}
+                    />
+                  );
                 }}
               />
             )}

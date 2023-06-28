@@ -10,6 +10,7 @@ import uuid from 'react-native-uuid';
 import * as Clipboard from 'expo-clipboard';
 import colors from '../constants/colors';
 import { Feather, FontAwesome } from '@expo/vector-icons';
+import { starMessage } from '../utils/actions/chatActions';
 
 const MenuItem = ({ text, onSelect, iconPack, icon }) => {
   const Icon = iconPack ?? Feather;
@@ -23,7 +24,7 @@ const MenuItem = ({ text, onSelect, iconPack, icon }) => {
   );
 };
 
-export const Bubble = ({ text, type }) => {
+export const Bubble = ({ text, type, messageId, userId, chatId }) => {
   const menuRef = useRef(null);
   const id = useRef(uuid.v4());
   const bubbleStyle = { ...styles.container };
@@ -90,8 +91,8 @@ export const Bubble = ({ text, type }) => {
               <MenuItem
                 icon='star-o'
                 iconPack={FontAwesome}
-                text='Start message'
-                onSelect={() => copyToClipboard(text)}
+                text='Star message'
+                onSelect={() => starMessage(messageId, userId, chatId)}
               />
             </MenuOptions>
           </Menu>
