@@ -52,8 +52,14 @@ export const ChatScreen = ({ navigation, route }) => {
         setChatId(id);
       }
 
-      await sendTextMessage(chatId, userData.userId, messageText);
+      await sendTextMessage(
+        chatId,
+        userData.userId,
+        messageText,
+        replyingTo && replyingTo.key,
+      );
       setMessageText('');
+      setReplayingTo(null);
     } catch (error) {
       console.log('sendMessage.error', error);
       setErrorBannerText('Message failed to send');
