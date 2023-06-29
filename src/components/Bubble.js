@@ -36,7 +36,15 @@ const MenuItem = ({ text, onSelect, iconPack, icon }) => {
   );
 };
 
-export const Bubble = ({ text, type, messageId, userId, chatId, date }) => {
+export const Bubble = ({
+  text,
+  type,
+  messageId,
+  userId,
+  chatId,
+  date,
+  setReply,
+}) => {
   const starredMessages = useSelector(
     (state) => state.messages.starredMessages[chatId] || {},
   );
@@ -130,6 +138,11 @@ export const Bubble = ({ text, type, messageId, userId, chatId, date }) => {
                 iconPack={FontAwesome}
                 text={`${isStarred ? 'Unstar' : 'Star'} message`}
                 onSelect={() => starMessage(messageId, chatId, userId)}
+              />
+              <MenuItem
+                icon='arrow-left-circle'
+                text='Reply'
+                onSelect={setReply}
               />
             </MenuOptions>
           </Menu>

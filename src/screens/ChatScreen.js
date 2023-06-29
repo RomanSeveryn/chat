@@ -17,12 +17,15 @@ import { useSelector } from 'react-redux';
 import { PageContainer } from '../components/PageContainer';
 import { Bubble } from '../components/Bubble';
 import { createChat, sendTextMessage } from '../utils/actions/chatActions';
+import { ReplyTo } from '../components/ReplyTo';
 
 export const ChatScreen = ({ navigation, route }) => {
   const [messageText, setMessageText] = useState('');
   const [chatUsers, setChatUsers] = useState([]);
   const [chatId, setChatId] = useState(route?.params?.chatId);
   const [errorBannerText, setErrorBannerText] = useState('');
+  const [replyingTo, setReplayingTo] = useState('');
+
   const storedUsers = useSelector((state) => state.users.storedUsers);
   const userData = useSelector((state) => state.auth.userData);
   const storedChats = useSelector((state) => state.chats.chatsData);
@@ -109,12 +112,20 @@ export const ChatScreen = ({ navigation, route }) => {
                       userId={userData.userId}
                       chatId={chatId}
                       date={message.sentAt}
+                      setReply={() => setReplayingTo(message)}
                     />
                   );
                 }}
               />
             )}
           </PageContainer>
+          {replyingTo && (
+            <ReplyTo
+              text={replyingTo.text}
+              user={storedUsers[replyingTo.sentBy]}
+              onCancel={() => setReplayingTo(null)}
+            />
+          )}
         </ImageBackground>
         <View style={styles.inputContainer}>
           <TouchableOpacity
