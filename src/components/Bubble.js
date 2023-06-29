@@ -44,10 +44,13 @@ export const Bubble = ({
   chatId,
   date,
   setReply,
+  replyingTo,
+  name,
 }) => {
   const starredMessages = useSelector(
     (state) => state.messages.starredMessages[chatId] || {},
   );
+  const storedUsers = useSelector((state) => state.users.storedUsers);
 
   const menuRef = useRef(null);
   const id = useRef(uuid.v4());
@@ -56,7 +59,7 @@ export const Bubble = ({
   const wrapperStyle = { ...styles.wrapperStyle };
   let Container = View;
   let isUserMessage = false;
-  const dateString = formatAmPm(date);
+  const dateString = date && formatAmPm(date);
 
   switch (type) {
     case 'system':
@@ -86,6 +89,9 @@ export const Bubble = ({
       isUserMessage = true;
       break;
 
+    case 'reply':
+      bubbleStyle.backgroundColor = '#f2f2f2';
+
     default:
       break;
   }
@@ -99,6 +105,7 @@ export const Bubble = ({
   };
 
   const isStarred = isUserMessage && starredMessages[messageId] !== undefined;
+  const replyingToUser = replyingTo && storedUsers[replyingTo.sentBy];
 
   return (
     <View style={wrapperStyle}>
@@ -106,9 +113,18 @@ export const Bubble = ({
         onLongPress={() =>
           menuRef.current.props.ctx.menuActions.openMenu(id.current)
         }
-        style={{ backgroundColor: 'red', width: '100%' }}
+        style={{ width: '100%' }}
       >
         <View style={bubbleStyle}>
+          {name && <Text style={styles.name}>{name}</Text>}
+          {replyingToUser && (
+            <Bubble
+              type='reply'
+              text={replyingTo.text}
+              name={`${replyingToUser.firstName} ${replyingToUser.lastName}`}
+            />
+          )}
+
           <Text style={textStyle}>{text}</Text>
 
           {dateString && (
@@ -187,6 +203,10 @@ const styles = StyleSheet.create({
     fontFamily: 'regular',
     fontSize: 12,
     color: colors.grey,
+    letterSpacing: 0.3,
+  },
+  name: {
+    fontFamily: 'medium',
     letterSpacing: 0.3,
   },
 });

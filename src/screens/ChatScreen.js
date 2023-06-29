@@ -119,6 +119,10 @@ export const ChatScreen = ({ navigation, route }) => {
                       chatId={chatId}
                       date={message.sentAt}
                       setReply={() => setReplayingTo(message)}
+                      replyingTo={
+                        message.replyTo &&
+                        chatMessages.find((i) => i.key === message.replyTo)
+                      }
                     />
                   );
                 }}
