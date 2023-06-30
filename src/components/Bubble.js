@@ -1,5 +1,11 @@
 import { useRef } from 'react';
-import { Text, View, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Image,
+} from 'react-native';
 import {
   Menu,
   MenuOptions,
@@ -46,6 +52,7 @@ export const Bubble = ({
   setReply,
   replyingTo,
   name,
+  imageUrl,
 }) => {
   const starredMessages = useSelector(
     (state) => state.messages.starredMessages[chatId] || {},
@@ -125,7 +132,10 @@ export const Bubble = ({
             />
           )}
 
-          <Text style={textStyle}>{text}</Text>
+          {!imageUrl && <Text style={textStyle}>{text}</Text>}
+          {imageUrl && (
+            <Image source={{ uri: imageUrl }} style={styles.image} />
+          )}
 
           {dateString && (
             <View style={styles.timeContainer}>
@@ -208,5 +218,10 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: 'medium',
     letterSpacing: 0.3,
+  },
+  image: {
+    height: 300,
+    width: 300,
+    marginBottom: 5,
   },
 });

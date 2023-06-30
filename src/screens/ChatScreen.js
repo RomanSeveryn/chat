@@ -122,6 +122,7 @@ export const ChatScreen = ({ navigation, route }) => {
         replyingTo && replyingTo.key,
       );
 
+      setReplayingTo(null);
       setTempImageUri('');
     } catch (error) {
       console.log(error);
@@ -168,6 +169,7 @@ export const ChatScreen = ({ navigation, route }) => {
                         message.replyTo &&
                         chatMessages.find((i) => i.key === message.replyTo)
                       }
+                      imageUrl={message.imageUrl}
                     />
                   );
                 }}
