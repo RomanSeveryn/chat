@@ -27,6 +27,7 @@ import {
 import { ReplyTo } from '../components/ReplyTo';
 import {
   launchImagePicker,
+  openCamera,
   uploadImageAsync,
 } from '../utils/imagePickerHelper';
 
@@ -105,6 +106,17 @@ export const ChatScreen = ({ navigation, route }) => {
       setTempImageUri(tempUri);
     } catch (e) {
       console.log('pickImage.e', e);
+    }
+  }, [tempImageUri]);
+
+  const takePhoto = useCallback(async () => {
+    try {
+      const tempUri = await openCamera();
+      if (!tempUri) return;
+
+      setTempImageUri(tempUri);
+    } catch (error) {
+      console.log('takePhoto.error', error);
     }
   }, [tempImageUri]);
 
@@ -201,10 +213,7 @@ export const ChatScreen = ({ navigation, route }) => {
             onSubmitEditing={sendMessage}
           />
           {messageText === '' && (
-            <TouchableOpacity
-              style={styles.mediaButtons}
-              onPress={() => console.log('camera')}
-            >
+            <TouchableOpacity style={styles.mediaButtons} onPress={takePhoto}>
               <Feather name='camera' size={24} color={colors.blue} />
             </TouchableOpacity>
           )}
