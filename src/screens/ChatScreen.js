@@ -112,22 +112,28 @@ export const ChatScreen = ({ navigation, route }) => {
     setIsLoading(true);
 
     try {
+      let id = chatId;
+      if (!id) {
+        id = await createChat(userData.userId, route.params.newChatData);
+        setChatId(id);
+      }
+
       const uploadUrl = await uploadImageAsync(tempImageUri, true);
       setIsLoading(false);
 
       await sendImage(
-        chatId,
+        id,
         userData.userId,
         uploadUrl,
         replyingTo && replyingTo.key,
       );
-
       setReplayingTo(null);
-      setTempImageUri('');
+
+      setTimeout(() => setTempImageUri(''), 500);
     } catch (error) {
       console.log(error);
     }
-  }, [isLoading, tempImageUri]);
+  }, [isLoading, tempImageUri, chatId]);
 
   return (
     <SafeAreaView style={styles.container} edges={['right', 'left', 'bottom']}>
