@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -39,6 +39,8 @@ export const ChatScreen = ({ navigation, route }) => {
   const [replyingTo, setReplayingTo] = useState('');
   const [tempImageUri, setTempImageUri] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const flatListRef = useRef();
 
   const storedUsers = useSelector((state) => state.users.storedUsers);
   const userData = useSelector((state) => state.auth.userData);
@@ -168,6 +170,13 @@ export const ChatScreen = ({ navigation, route }) => {
             {chatId && (
               <FlatList
                 data={chatMessages}
+                ref={(ref) => (flatListRef.current = ref)}
+                onContentSizeChange={() =>
+                  flatListRef.current.scrollToEnd({ animated: true })
+                }
+                onLayout={() =>
+                  flatListRef.current.scrollToEnd({ animated: true })
+                }
                 renderItem={(itemData) => {
                   const message = itemData.item;
                   const isOwnMessage = message.sentBy === userData.userId;
