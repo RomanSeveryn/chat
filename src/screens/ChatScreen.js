@@ -9,6 +9,7 @@ import {
   Platform,
   FlatList,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import backgroundImage from '../../assets/images/green-nature-background.jpg';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,7 +21,10 @@ import { PageContainer } from '../components/PageContainer';
 import { Bubble } from '../components/Bubble';
 import { createChat, sendTextMessage } from '../utils/actions/chatActions';
 import { ReplyTo } from '../components/ReplyTo';
-import { launchImagePicker } from '../utils/imagePickerHelper';
+import {
+  launchImagePicker,
+  uploadImageAsync,
+} from '../utils/imagePickerHelper';
 
 export const ChatScreen = ({ navigation, route }) => {
   const [messageText, setMessageText] = useState('');
@@ -29,6 +33,7 @@ export const ChatScreen = ({ navigation, route }) => {
   const [errorBannerText, setErrorBannerText] = useState('');
   const [replyingTo, setReplayingTo] = useState('');
   const [tempImageUri, setTempImageUri] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const storedUsers = useSelector((state) => state.users.storedUsers);
   const userData = useSelector((state) => state.auth.userData);
@@ -98,6 +103,19 @@ export const ChatScreen = ({ navigation, route }) => {
       console.log('pickImage.e', e);
     }
   }, [tempImageUri]);
+
+  const uploadImage = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const uploadUrl = await uploadImageAsync(tempImageUri, true);
+      setIsLoading(false);
+
+      setTempImageUri('');
+    } catch (e) {
+      console.log('uploadImage.e', e);
+      setIsLoading(false);
+    }
+  }, [isLoading, tempImageUri]);
 
   return (
     <SafeAreaView style={styles.container} edges={['right', 'left', 'bottom']}>
@@ -194,18 +212,21 @@ export const ChatScreen = ({ navigation, route }) => {
             onCancelPressed={() => {
               setTempImageUri('');
             }}
-            onConfirmPressed={() => {
-              console.log('upload');
-            }}
+            onConfirmPressed={uploadImage}
             onDismiss={() => {
               setTempImageUri('');
             }}
             customView={
               <View>
-                <Image
-                  source={{ uri: tempImageUri }}
-                  style={{ width: 200, height: 200 }}
-                />
+                {isLoading && (
+                  <ActivityIndicator size='small' color={colors.primary} />
+                )}
+                {!isLoading && tempImageUri !== '' && (
+                  <Image
+                    source={{ uri: tempImageUri }}
+                    style={{ width: 200, height: 200 }}
+                  />
+                )}
               </View>
             }
           />
