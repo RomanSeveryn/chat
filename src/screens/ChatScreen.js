@@ -19,7 +19,11 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import { useSelector } from 'react-redux';
 import { PageContainer } from '../components/PageContainer';
 import { Bubble } from '../components/Bubble';
-import { createChat, sendTextMessage } from '../utils/actions/chatActions';
+import {
+  createChat,
+  sendImage,
+  sendTextMessage,
+} from '../utils/actions/chatActions';
 import { ReplyTo } from '../components/ReplyTo';
 import {
   launchImagePicker,
@@ -106,14 +110,21 @@ export const ChatScreen = ({ navigation, route }) => {
 
   const uploadImage = useCallback(async () => {
     setIsLoading(true);
+
     try {
       const uploadUrl = await uploadImageAsync(tempImageUri, true);
       setIsLoading(false);
 
+      await sendImage(
+        chatId,
+        userData.userId,
+        uploadUrl,
+        replyingTo && replyingTo.key,
+      );
+
       setTempImageUri('');
-    } catch (e) {
-      console.log('uploadImage.e', e);
-      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
     }
   }, [isLoading, tempImageUri]);
 
