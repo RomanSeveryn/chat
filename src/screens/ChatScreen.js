@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -7,12 +8,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   FlatList,
+  Image,
 } from 'react-native';
 import backgroundImage from '../../assets/images/green-nature-background.jpg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import colors from '../constants/colors';
-import { useCallback, useEffect, useState } from 'react';
+import AwesomeAlert from 'react-native-awesome-alerts';
 import { useSelector } from 'react-redux';
 import { PageContainer } from '../components/PageContainer';
 import { Bubble } from '../components/Bubble';
@@ -177,6 +179,36 @@ export const ChatScreen = ({ navigation, route }) => {
               <Feather name='send' size={20} color='white' />
             </TouchableOpacity>
           )}
+          <AwesomeAlert
+            show={tempImageUri !== ''}
+            title='Send Image?'
+            closeOnTouchOutside={true}
+            closeOnHardwareBackPress={false}
+            showCancelButton={true}
+            showConfirmButton={true}
+            cancelText='Cancel'
+            confirmText='Send image'
+            confirmButtonColor={colors.primary}
+            cancelButtonColor={colors.red}
+            titleStyle={styles.popupTitleStyle}
+            onCancelPressed={() => {
+              setTempImageUri('');
+            }}
+            onConfirmPressed={() => {
+              console.log('upload');
+            }}
+            onDismiss={() => {
+              setTempImageUri('');
+            }}
+            customView={
+              <View>
+                <Image
+                  source={{ uri: tempImageUri }}
+                  style={{ width: 200, height: 200 }}
+                />
+              </View>
+            }
+          />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -215,5 +247,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.blue,
     borderRadius: 50,
     padding: 8,
+  },
+  popupTitleStyle: {
+    fontFamily: 'medium',
+    letterSpacing: 0.3,
+    color: colors.textColor,
   },
 });
