@@ -18,7 +18,7 @@ import { DataItem } from '../components/DataItem';
 import { useDispatch, useSelector } from 'react-redux';
 import { setStoredUsers } from '../store/userSlice';
 
-export const NewChatScreen = ({ navigation }) => {
+export const NewChatScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -27,6 +27,8 @@ export const NewChatScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const userData = useSelector((state) => state.auth.userData);
+
+  const isGroupChat = route.params && route.params.isGroupChat;
 
   useEffect(() => {
     navigation.setOptions({
@@ -37,7 +39,7 @@ export const NewChatScreen = ({ navigation }) => {
           </HeaderButtons>
         );
       },
-      headerTitle: 'New chat',
+      headerTitle: isGroupChat ? 'Add Participants' : 'New chat',
     });
   }, []);
 
@@ -77,6 +79,18 @@ export const NewChatScreen = ({ navigation }) => {
 
   return (
     <PageContainer>
+      {isGroupChat && (
+        <View style={styles.chatNameContainer}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.textBox}
+              placeholder='Enter a name for your chat'
+              autoCorrect={false}
+              autoComplete={false}
+            />
+          </View>
+        </View>
+      )}
       <View style={styles.searchContainer}>
         <FontAwesome name='search' size={15} color={colors.lightGrey} />
         <TextInput
@@ -160,6 +174,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   noResultsText: {
+    color: colors.textColor,
+    fontFamily: 'regular',
+    letterSpacing: 0.3,
+  },
+  chatNameContainer: {
+    paddingVertical: 10,
+  },
+  inputContainer: {
+    width: '100%',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    backgroundColor: colors.nearlyWhite,
+    flexDirection: 'row',
+    borderRadius: 2,
+  },
+  textBox: {
+    width: '100%',
     color: colors.textColor,
     fontFamily: 'regular',
     letterSpacing: 0.3,
