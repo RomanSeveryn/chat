@@ -25,10 +25,12 @@ export const NewChatScreen = ({ navigation, route }) => {
   const [users, setUsers] = useState();
   const [noResultsFound, setNoResultsFound] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [chatName, setChatName] = useState('');
 
   const userData = useSelector((state) => state.auth.userData);
 
   const isGroupChat = route.params && route.params.isGroupChat;
+  const isGroupChatDisabled = chatName === '';
 
   useEffect(() => {
     navigation.setOptions({
@@ -39,9 +41,23 @@ export const NewChatScreen = ({ navigation, route }) => {
           </HeaderButtons>
         );
       },
+      headerRight: () => {
+        return (
+          <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+            {isGroupChat && (
+              <Item
+                title='Create'
+                disabled={isGroupChatDisabled}
+                color={isGroupChatDisabled ? colors.lightGrey : undefined}
+                onPress={() => {}}
+              />
+            )}
+          </HeaderButtons>
+        );
+      },
       headerTitle: isGroupChat ? 'Add Participants' : 'New chat',
     });
-  }, []);
+  }, [chatName]);
 
   useEffect(() => {
     const delaySearch = setTimeout(async () => {
@@ -87,6 +103,8 @@ export const NewChatScreen = ({ navigation, route }) => {
               placeholder='Enter a name for your chat'
               autoCorrect={false}
               autoComplete={false}
+              value={chatName}
+              onChangeText={(text) => setChatName(text)}
             />
           </View>
         </View>
