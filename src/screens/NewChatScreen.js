@@ -137,6 +137,8 @@ export const NewChatScreen = ({ navigation, route }) => {
                 subTitle={userData.about}
                 image={userData.profilePicture}
                 onPress={() => userPressed(userId)}
+                type={isGroupChat ? 'checkbox' : ''}
+                isChecked={false}
               />
             );
           }}
