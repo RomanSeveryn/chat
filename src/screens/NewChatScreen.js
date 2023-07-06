@@ -17,6 +17,7 @@ import { searchUsers } from '../utils/actions/userActions';
 import { DataItem } from '../components/DataItem';
 import { useDispatch, useSelector } from 'react-redux';
 import { setStoredUsers } from '../store/userSlice';
+import { ProfileImage } from '../components/ProfileImage';
 
 export const NewChatScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -26,11 +27,13 @@ export const NewChatScreen = ({ navigation, route }) => {
   const [noResultsFound, setNoResultsFound] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [chatName, setChatName] = useState('');
+  const [selectedUsers, setSelectedUsers] = useState([]);
 
   const userData = useSelector((state) => state.auth.userData);
+  const storedUsers = useSelector((state) => state.users.storedUsers);
 
   const isGroupChat = route.params && route.params.isGroupChat;
-  const isGroupChatDisabled = chatName === '';
+  const isGroupChatDisabled = selectedUsers.length === 0 || chatName === '';
 
   useEffect(() => {
     navigation.setOptions({
@@ -57,7 +60,7 @@ export const NewChatScreen = ({ navigation, route }) => {
       },
       headerTitle: isGroupChat ? 'Add Participants' : 'New chat',
     });
-  }, [chatName]);
+  }, [chatName, selectedUsers]);
 
   useEffect(() => {
     const delaySearch = setTimeout(async () => {
@@ -88,26 +91,58 @@ export const NewChatScreen = ({ navigation, route }) => {
   }, [searchTerm]);
 
   const userPressed = (userId) => {
-    navigation.navigate('ChatList', {
-      selectedUserId: userId,
-    });
+    if (isGroupChat) {
+      const newSelectedUsers = selectedUsers.includes(userId)
+        ? selectedUsers.filter((id) => id !== userId)
+        : selectedUsers.concat(userId);
+      setSelectedUsers(newSelectedUsers);
+    } else {
+      navigation.navigate('ChatList', {
+        selectedUserId: userId,
+      });
+    }
   };
 
   return (
     <PageContainer>
       {isGroupChat && (
-        <View style={styles.chatNameContainer}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textBox}
-              placeholder='Enter a name for your chat'
-              autoCorrect={false}
-              autoComplete={false}
-              value={chatName}
-              onChangeText={(text) => setChatName(text)}
+        <>
+          <View style={styles.chatNameContainer}>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.textBox}
+                placeholder='Enter a name for your chat'
+                autoCorrect={false}
+                autoComplete={false}
+                value={chatName}
+                onChangeText={(text) => setChatName(text)}
+              />
+            </View>
+          </View>
+
+          <View style={styles.selectedUsersContainer}>
+            <FlatList
+              data={selectedUsers}
+              contentContainerStyle={{ alignItems: 'center' }}
+              keyExtractor={(item) => item}
+              horizontal={true}
+              renderItem={(itemData) => {
+                const userId = itemData.item;
+                const userData = storedUsers[userId];
+                return (
+                  <ProfileImage
+                    style={styles.selectedUserStyle}
+                    uri={userData.profilePicture}
+                    size={40}
+                    onPress={() => userPressed(userId)}
+                    showRemoveButton={true}
+                  />
+                );
+              }}
+              style={styles.selectedUsersList}
             />
           </View>
-        </View>
+        </>
       )}
       <View style={styles.searchContainer}>
         <FontAwesome name='search' size={15} color={colors.lightGrey} />
@@ -138,7 +173,7 @@ export const NewChatScreen = ({ navigation, route }) => {
                 image={userData.profilePicture}
                 onPress={() => userPressed(userId)}
                 type={isGroupChat ? 'checkbox' : ''}
-                isChecked={false}
+                isChecked={selectedUsers.includes(userId)}
               />
             );
           }}
@@ -214,5 +249,17 @@ const styles = StyleSheet.create({
     color: colors.textColor,
     fontFamily: 'regular',
     letterSpacing: 0.3,
+  },
+  selectedUsersContainer: {
+    height: 50,
+    justifyContent: 'center',
+  },
+  selectedUsersList: {
+    height: '100%',
+    paddingTop: 10,
+  },
+  selectedUserStyle: {
+    marginRight: 10,
+    marginBottom: 10,
   },
 });
