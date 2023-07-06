@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -28,6 +28,8 @@ export const NewChatScreen = ({ navigation, route }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [chatName, setChatName] = useState('');
   const [selectedUsers, setSelectedUsers] = useState([]);
+
+  const selectedUsersFlatListRef = useRef();
 
   const userData = useSelector((state) => state.auth.userData);
   const storedUsers = useSelector((state) => state.users.storedUsers);
@@ -124,6 +126,10 @@ export const NewChatScreen = ({ navigation, route }) => {
             <FlatList
               data={selectedUsers}
               contentContainerStyle={{ alignItems: 'center' }}
+              ref={(ref) => (selectedUsersFlatListRef.current = ref)}
+              onContentSizeChange={() =>
+                selectedUsersFlatListRef.current.scrollToEnd()
+              }
               keyExtractor={(item) => item}
               horizontal={true}
               renderItem={(itemData) => {
