@@ -54,7 +54,12 @@ export const NewChatScreen = ({ navigation, route }) => {
                 title='Create'
                 disabled={isGroupChatDisabled}
                 color={isGroupChatDisabled ? colors.lightGrey : undefined}
-                onPress={() => {}}
+                onPress={() => {
+                  navigation.navigate('ChatList', {
+                    selectedUsers,
+                    chatName,
+                  });
+                }}
               />
             )}
           </HeaderButtons>
@@ -115,7 +120,7 @@ export const NewChatScreen = ({ navigation, route }) => {
                 style={styles.textBox}
                 placeholder='Enter a name for your chat'
                 autoCorrect={false}
-                autoComplete={false}
+                // autoComplete={false}
                 value={chatName}
                 onChangeText={(text) => setChatName(text)}
               />
@@ -126,10 +131,10 @@ export const NewChatScreen = ({ navigation, route }) => {
             <FlatList
               data={selectedUsers}
               contentContainerStyle={{ alignItems: 'center' }}
-              ref={(ref) => (selectedUsersFlatListRef.current = ref)}
-              onContentSizeChange={() =>
-                selectedUsersFlatListRef.current.scrollToEnd()
-              }
+              // ref={(ref) => (selectedUsersFlatListRef.current = ref)}
+              // onContentSizeChange={() =>
+              //   selectedUsersFlatListRef.current.scrollToEnd()
+              // }
               keyExtractor={(item) => item}
               horizontal={true}
               renderItem={(itemData) => {

@@ -10,6 +10,8 @@ import colors from '../constants/colors';
 
 export const ChatListScreen = ({ navigation, route }) => {
   const selectedUser = route?.params?.selectedUserId;
+  const selectedUserList = route?.params?.selectedUsers;
+  const chatName = route?.params?.chatName;
 
   const userData = useSelector((state) => state.auth.userData);
   const storedUsers = useSelector((state) => state.users.storedUsers);
@@ -38,10 +40,23 @@ export const ChatListScreen = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    if (!selectedUser) return;
+    if (!selectedUser && !selectedUserList) return;
 
-    const chatUsers = [selectedUser, userData.userId];
-    const navigationProps = { newChatData: { users: chatUsers } };
+    const chatUsers = selectedUserList || [selectedUser];
+
+    if (!chatUsers.includes(userData.userId)) {
+      chatUsers.push(userData.userId);
+    }
+    const navigationProps = {
+      newChatData: {
+        users: chatUsers,
+        isGroupChat: selectedUserList !== undefined,
+      },
+    };
+
+    if (chatName) {
+      navigationProps.chatName = chatName;
+    }
 
     navigation.navigate('ChatScreen', navigationProps);
   }, [route?.params]);
