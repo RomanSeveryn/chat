@@ -40,22 +40,34 @@ export const ChatListScreen = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    if (!selectedUser && !selectedUserList) return;
-
-    const chatUsers = selectedUserList || [selectedUser];
-
-    if (!chatUsers.includes(userData.userId)) {
-      chatUsers.push(userData.userId);
+    if (!selectedUser && !selectedUserList) {
+      return;
     }
-    const navigationProps = {
-      newChatData: {
-        users: chatUsers,
-        isGroupChat: selectedUserList !== undefined,
-      },
-    };
 
-    if (chatName) {
-      navigationProps.chatName = chatName;
+    let chatData;
+    let navigationProps;
+
+    if (selectedUser) {
+      chatData = userChats.find(
+        (cd) => !cd.isGroupChat && cd.users.includes(selectedUser),
+      );
+    }
+
+    if (chatData) {
+      navigationProps = { chatId: chatData.key };
+    } else {
+      const chatUsers = selectedUserList || [selectedUser];
+      if (!chatUsers.includes(userData.userId)) {
+        chatUsers.push(userData.userId);
+      }
+
+      navigationProps = {
+        newChatData: {
+          users: chatUsers,
+          isGroupChat: selectedUserList !== undefined,
+          chatName,
+        },
+      };
     }
 
     navigation.navigate('ChatScreen', navigationProps);
