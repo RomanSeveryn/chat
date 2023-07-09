@@ -11,7 +11,12 @@ import { child, getDatabase, onValue, ref, off, get } from 'firebase/database';
 import { useEffect, useState } from 'react';
 import { getFirebaseApp } from '../utils/firebaseHalper';
 import { setChatsData } from '../store/chatSlice';
-import { ActivityIndicator, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  View,
+} from 'react-native';
 import colors from '../constants/colors';
 import commonStyles from '../constants/commonStyles';
 import { setStoredUsers } from '../store/userSlice';
@@ -185,5 +190,12 @@ export const MainNavigator = () => {
     );
   }
 
-  return <StackNavigator />;
+  return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'android' ? 'height' : 'padding'}
+    >
+      <StackNavigator />
+    </KeyboardAvoidingView>
+  );
 };

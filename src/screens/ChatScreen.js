@@ -5,8 +5,6 @@ import {
   TextInput,
   View,
   ImageBackground,
-  KeyboardAvoidingView,
-  Platform,
   FlatList,
   Image,
   ActivityIndicator,
@@ -151,124 +149,113 @@ export const ChatScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container} edges={['right', 'left', 'bottom']}>
-      <KeyboardAvoidingView
-        style={styles.screen}
-        behavior={Platform.OS === 'android' ? 'height' : 'padding'}
-        keyboardVerticalOffset={100}
-      >
-        <ImageBackground
-          source={backgroundImage}
-          style={styles.backgroundImage}
-        >
-          <PageContainer style={{ backgroundColor: 'transparent' }}>
-            {!chatId && (
-              <Bubble text='This is a new chat. Say hi!' type='system' />
-            )}
-            {errorBannerText !== '' && (
-              <Bubble text={errorBannerText} type='error' />
-            )}
-            {chatId && (
-              <FlatList
-                data={chatMessages}
-                ref={(ref) => (flatListRef.current = ref)}
-                onContentSizeChange={() =>
-                  flatListRef.current.scrollToEnd({ animated: true })
-                }
-                onLayout={() =>
-                  flatListRef.current.scrollToEnd({ animated: true })
-                }
-                renderItem={(itemData) => {
-                  const message = itemData.item;
-                  const isOwnMessage = message.sentBy === userData.userId;
-                  const messageType = isOwnMessage
-                    ? 'myMessage'
-                    : 'theirMessage';
-                  return (
-                    <Bubble
-                      text={message.text}
-                      type={messageType}
-                      messageId={message.key}
-                      userId={userData.userId}
-                      chatId={chatId}
-                      date={message.sentAt}
-                      setReply={() => setReplayingTo(message)}
-                      replyingTo={
-                        message.replyTo &&
-                        chatMessages.find((i) => i.key === message.replyTo)
-                      }
-                      imageUrl={message.imageUrl}
-                    />
-                  );
-                }}
-              />
-            )}
-          </PageContainer>
-          {replyingTo && (
-            <ReplyTo
-              text={replyingTo.text}
-              user={storedUsers[replyingTo.sentBy]}
-              onCancel={() => setReplayingTo(null)}
+      <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
+        <PageContainer style={{ backgroundColor: 'transparent' }}>
+          {!chatId && (
+            <Bubble text='This is a new chat. Say hi!' type='system' />
+          )}
+          {errorBannerText !== '' && (
+            <Bubble text={errorBannerText} type='error' />
+          )}
+          {chatId && (
+            <FlatList
+              data={chatMessages}
+              ref={(ref) => (flatListRef.current = ref)}
+              onContentSizeChange={() =>
+                flatListRef.current.scrollToEnd({ animated: true })
+              }
+              onLayout={() =>
+                flatListRef.current.scrollToEnd({ animated: true })
+              }
+              renderItem={(itemData) => {
+                const message = itemData.item;
+                const isOwnMessage = message.sentBy === userData.userId;
+                const messageType = isOwnMessage ? 'myMessage' : 'theirMessage';
+                return (
+                  <Bubble
+                    text={message.text}
+                    type={messageType}
+                    messageId={message.key}
+                    userId={userData.userId}
+                    chatId={chatId}
+                    date={message.sentAt}
+                    setReply={() => setReplayingTo(message)}
+                    replyingTo={
+                      message.replyTo &&
+                      chatMessages.find((i) => i.key === message.replyTo)
+                    }
+                    imageUrl={message.imageUrl}
+                  />
+                );
+              }}
             />
           )}
-        </ImageBackground>
-        <View style={styles.inputContainer}>
-          <TouchableOpacity style={styles.mediaButtons} onPress={pickImage}>
-            <Feather name='plus' size={24} color={colors.blue} />
+        </PageContainer>
+        {replyingTo && (
+          <ReplyTo
+            text={replyingTo.text}
+            user={storedUsers[replyingTo.sentBy]}
+            onCancel={() => setReplayingTo(null)}
+          />
+        )}
+      </ImageBackground>
+      <View style={styles.inputContainer}>
+        <TouchableOpacity style={styles.mediaButtons} onPress={pickImage}>
+          <Feather name='plus' size={24} color={colors.blue} />
+        </TouchableOpacity>
+        <TextInput
+          value={messageText}
+          onChangeText={(text) => setMessageText(text)}
+          style={styles.textBox}
+          onSubmitEditing={sendMessage}
+        />
+        {messageText === '' && (
+          <TouchableOpacity style={styles.mediaButtons} onPress={takePhoto}>
+            <Feather name='camera' size={24} color={colors.blue} />
           </TouchableOpacity>
-          <TextInput
-            value={messageText}
-            onChangeText={(text) => setMessageText(text)}
-            style={styles.textBox}
-            onSubmitEditing={sendMessage}
-          />
-          {messageText === '' && (
-            <TouchableOpacity style={styles.mediaButtons} onPress={takePhoto}>
-              <Feather name='camera' size={24} color={colors.blue} />
-            </TouchableOpacity>
-          )}
-          {messageText !== '' && (
-            <TouchableOpacity
-              style={{ ...styles.mediaButtons, ...styles.sendButton }}
-              onPress={sendMessage}
-            >
-              <Feather name='send' size={20} color='white' />
-            </TouchableOpacity>
-          )}
-          <AwesomeAlert
-            show={tempImageUri !== ''}
-            title='Send Image?'
-            closeOnTouchOutside={true}
-            closeOnHardwareBackPress={false}
-            showCancelButton={true}
-            showConfirmButton={true}
-            cancelText='Cancel'
-            confirmText='Send image'
-            confirmButtonColor={colors.primary}
-            cancelButtonColor={colors.red}
-            titleStyle={styles.popupTitleStyle}
-            onCancelPressed={() => {
-              setTempImageUri('');
-            }}
-            onConfirmPressed={uploadImage}
-            onDismiss={() => {
-              setTempImageUri('');
-            }}
-            customView={
-              <View>
-                {isLoading && (
-                  <ActivityIndicator size='small' color={colors.primary} />
-                )}
-                {!isLoading && tempImageUri !== '' && (
-                  <Image
-                    source={{ uri: tempImageUri }}
-                    style={{ width: 200, height: 200 }}
-                  />
-                )}
-              </View>
-            }
-          />
-        </View>
-      </KeyboardAvoidingView>
+        )}
+        {messageText !== '' && (
+          <TouchableOpacity
+            style={{ ...styles.mediaButtons, ...styles.sendButton }}
+            onPress={sendMessage}
+          >
+            <Feather name='send' size={20} color='white' />
+          </TouchableOpacity>
+        )}
+        <AwesomeAlert
+          show={tempImageUri !== ''}
+          title='Send Image?'
+          closeOnTouchOutside={true}
+          closeOnHardwareBackPress={false}
+          showCancelButton={true}
+          showConfirmButton={true}
+          cancelText='Cancel'
+          confirmText='Send image'
+          confirmButtonColor={colors.primary}
+          cancelButtonColor={colors.red}
+          titleStyle={styles.popupTitleStyle}
+          onCancelPressed={() => {
+            setTempImageUri('');
+          }}
+          onConfirmPressed={uploadImage}
+          onDismiss={() => {
+            setTempImageUri('');
+          }}
+          customView={
+            <View>
+              {isLoading && (
+                <ActivityIndicator size='small' color={colors.primary} />
+              )}
+              {!isLoading && tempImageUri !== '' && (
+                <Image
+                  source={{ uri: tempImageUri }}
+                  style={{ width: 200, height: 200 }}
+                />
+              )}
+            </View>
+          }
+        />
+      </View>
     </SafeAreaView>
   );
 };
