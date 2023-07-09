@@ -173,6 +173,10 @@ export const ChatScreen = ({ navigation, route }) => {
                 const message = itemData.item;
                 const isOwnMessage = message.sentBy === userData.userId;
                 const messageType = isOwnMessage ? 'myMessage' : 'theirMessage';
+
+                const sender = message.sentBy && storedUsers[message.sentBy];
+                const name = sender && `${sender.firstName} ${sender.lastName}`;
+
                 return (
                   <Bubble
                     text={message.text}
@@ -182,6 +186,9 @@ export const ChatScreen = ({ navigation, route }) => {
                     chatId={chatId}
                     date={message.sentAt}
                     setReply={() => setReplayingTo(message)}
+                    name={
+                      !chatData.isGroupChat || isOwnMessage ? undefined : name
+                    }
                     replyingTo={
                       message.replyTo &&
                       chatMessages.find((i) => i.key === message.replyTo)
