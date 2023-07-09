@@ -67,7 +67,7 @@ export const ChatScreen = ({ navigation, route }) => {
       }
 
       await sendTextMessage(
-        chatId,
+        id,
         userData.userId,
         messageText,
         replyingTo && replyingTo.key,
@@ -90,9 +90,11 @@ export const ChatScreen = ({ navigation, route }) => {
     );
   };
 
+  const title = chatData.chatName ?? getChatTitleFromName();
+
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: getChatTitleFromName(),
+      headerTitle: title,
     });
     setChatUsers(chatData.users);
   }, [chatUsers]);
