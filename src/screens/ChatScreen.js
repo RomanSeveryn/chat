@@ -104,7 +104,13 @@ export const ChatScreen = ({ navigation, route }) => {
               <Item
                 title='Chat settings'
                 iconName='settings-outline'
-                onPress={() => {}}
+                onPress={() => {
+                  chatData.isGroupChat
+                    ? navigation.navigate('')
+                    : navigation.navigate('Contact', {
+                        uid: chatUsers.find((uid) => uid !== userData.userId),
+                      });
+                }}
               />
             )}
           </HeaderButtons>
