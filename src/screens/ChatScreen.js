@@ -28,6 +28,8 @@ import {
   openCamera,
   uploadImageAsync,
 } from '../utils/imagePickerHelper';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import { CustomHeaderButton } from '../components/CustomHeaderButton';
 
 export const ChatScreen = ({ navigation, route }) => {
   const [messageText, setMessageText] = useState('');
@@ -95,6 +97,19 @@ export const ChatScreen = ({ navigation, route }) => {
   useEffect(() => {
     navigation.setOptions({
       headerTitle: title,
+      headerRight: () => {
+        return (
+          <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+            {chatId && (
+              <Item
+                title='Chat settings'
+                iconName='settings-outline'
+                onPress={() => {}}
+              />
+            )}
+          </HeaderButtons>
+        );
+      },
     });
     setChatUsers(chatData.users);
   }, [chatUsers]);
