@@ -8,7 +8,7 @@ import { getUserChats } from '../utils/actions/userActions';
 import { useEffect, useState } from 'react';
 import { DataItem } from '../components/DataItem';
 
-export const ContactScreen = ({ route }) => {
+export const ContactScreen = ({ navigation, route }) => {
   const storedUsers = useSelector((state) => state.users.storedUsers);
   const currentUser = storedUsers[route.params.uid];
 
@@ -57,6 +57,7 @@ export const ContactScreen = ({ route }) => {
                 key={cid}
                 title={chatData.chatName}
                 subTitle={chatData.latestMessageText}
+                onPress={() => navigation.push('ChatScreen', { chatId: cid })}
               />
             );
           })}
