@@ -58,6 +58,7 @@ export const ContactScreen = ({ navigation, route }) => {
                 title={chatData.chatName}
                 subTitle={chatData.latestMessageText}
                 onPress={() => navigation.push('ChatScreen', { chatId: cid })}
+                image={chatData.chatImage}
               />
             );
           })}
