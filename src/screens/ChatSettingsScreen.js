@@ -1,22 +1,34 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
+import { useSelector } from 'react-redux';
+import { PageContainer } from '../components/PageContainer';
+import { PageTitle } from '../components/PageTitle';
+import { ProfileImage } from '../components/ProfileImage';
 
-export const ChatSettingsScreen = () => {
+export const ChatSettingsScreen = ({ route }) => {
+  const chatId = route.params.chatId;
+  const chatData = useSelector((state) => state.chats.chatsData[chatId]);
+
   return (
-    <View style={styles.container}>
-      <Text>Hi ChatSettingsScreen</Text>
-    </View>
+    <PageContainer>
+      <PageTitle text='Chat Settings' />
+
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <ProfileImage showEditButton={true} size={80} chatId={chatId} />
+
+        <Text>{chatData.chatName}</Text>
+      </ScrollView>
+    </PageContainer>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  label: {
-    fontSize: 32,
-    fontFamily: 'black',
+  scrollView: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
