@@ -118,7 +118,7 @@ export const ChatScreen = ({ navigation, route }) => {
       },
     });
     setChatUsers(chatData.users);
-  }, [chatUsers]);
+  }, [chatUsers, title]);
 
   const pickImage = useCallback(async () => {
     try {

@@ -82,6 +82,8 @@ export const ChatSettingsScreen = ({ route }) => {
           errorText={formState.inputValidities['chatName']}
         />
 
+        {showSuccessMessage && <Text>Saved!!!</Text>}
+
         {isLoading ? (
           <ActivityIndicator size={'small'} color={colors.primary} />
         ) : (
