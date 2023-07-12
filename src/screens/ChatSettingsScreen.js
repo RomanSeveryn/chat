@@ -7,13 +7,20 @@ import { ProfileImage } from '../components/ProfileImage';
 export const ChatSettingsScreen = ({ route }) => {
   const chatId = route.params.chatId;
   const chatData = useSelector((state) => state.chats.chatsData[chatId]);
+  const userData = useSelector((state) => state.auth.userData);
 
   return (
     <PageContainer>
       <PageTitle text='Chat Settings' />
 
       <ScrollView contentContainerStyle={styles.scrollView}>
-        <ProfileImage showEditButton={true} size={80} chatId={chatId} />
+        <ProfileImage
+          showEditButton={true}
+          size={80}
+          chatId={chatId}
+          userId={userData.userId}
+          uri={chatData.chatImage}
+        />
 
         <Text>{chatData.chatName}</Text>
       </ScrollView>
