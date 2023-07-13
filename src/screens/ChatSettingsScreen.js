@@ -1,5 +1,11 @@
 import { useCallback, useReducer, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text } from 'react-native';
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { useSelector } from 'react-redux';
 import { PageContainer } from '../components/PageContainer';
 import { PageTitle } from '../components/PageTitle';
@@ -10,14 +16,16 @@ import { validateInput } from '../utils/actions/formActions';
 import { updateChatData } from '../utils/actions/chatActions';
 import { SubmitButton } from '../components/SubmitButton';
 import colors from '../constants/colors';
+import { DataItem } from '../components/DataItem';
 
-export const ChatSettingsScreen = ({ route }) => {
+export const ChatSettingsScreen = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const chatId = route.params.chatId;
   const chatData = useSelector((state) => state.chats.chatsData[chatId]);
   const userData = useSelector((state) => state.auth.userData);
+  const storedUsers = useSelector((state) => state.users.storedUsers);
 
   const initialState = {
     inputValues: { chatName: chatData.chatName },
@@ -82,6 +90,30 @@ export const ChatSettingsScreen = ({ route }) => {
           errorText={formState.inputValidities['chatName']}
         />
 
+        <View style={styles.sectionContainer}>
+          <Text style={styles.heading}>
+            {chatData.users.length} Participants
+          </Text>
+
+          <DataItem title='Add users' icon='plus' type='button' />
+          {chatData.users.map((uid) => {
+            const currentUser = storedUsers[uid];
+            return (
+              <DataItem
+                key={uid}
+                image={currentUser.profilePicture}
+                title={`${currentUser.firstName} ${currentUser.lastName}`}
+                subTitle={currentUser.about}
+                type={uid !== userData.userId && 'link'}
+                onPress={() =>
+                  uid !== userData.userId &&
+                  navigation.navigate('Contact', { uid })
+                }
+              />
+            );
+          })}
+        </View>
+
         {showSuccessMessage && <Text>Saved!!!</Text>}
 
         {isLoading ? (
@@ -110,5 +142,15 @@ const styles = StyleSheet.create({
   scrollView: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  sectionContainer: {
+    width: '100%',
+    marginTop: 10,
+  },
+  heading: {
+    marginVertical: 8,
+    color: colors.textColor,
+    fontFamily: 'bold',
+    letterSpacing: 0.3,
   },
 });
