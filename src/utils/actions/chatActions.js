@@ -55,7 +55,11 @@ export const sendTextMessage = async (
 };
 
 export const sendImage = async (chatId, senderId, imageUrl, replyTo) => {
-  await sendMessage(chatId, senderId, 'Image', imageUrl, replyTo);
+  await sendMessage(chatId, senderId, 'Image', imageUrl, replyTo, null);
+};
+
+export const sendInfoMessage = async (chatId, senderId, messageText) => {
+  await sendMessage(chatId, senderId, messageText, null, null, 'info');
 };
 
 const sendMessage = async (
@@ -64,6 +68,7 @@ const sendMessage = async (
   messageText,
   imageUrl,
   replyTo,
+  type,
 ) => {
   const dbRef = ref(getDatabase());
   const messagesRef = child(dbRef, `messages/${chatId}`);
@@ -80,6 +85,10 @@ const sendMessage = async (
 
   if (imageUrl) {
     messageData.imageUrl = imageUrl;
+  }
+
+  if (type) {
+    messageData.type = type;
   }
 
   await push(messagesRef, messageData);
@@ -142,4 +151,8 @@ export const removeUserFromChat = async (
       break;
     }
   }
+
+  const messageText = `${userLoggedInData.firstName} removed ${userToRemoveData.firstName} from the chat`;
+
+  await sendInfoMessage(chatData.key, userLoggedInData.userId, messageText);
 };
