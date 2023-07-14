@@ -1,19 +1,26 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useSelector } from 'react-redux';
 import { PageContainer } from '../components/PageContainer';
 import { ProfileImage } from '../components/ProfileImage';
 import { PageTitle } from '../components/PageTitle';
 import colors from '../constants/colors';
 import { getUserChats } from '../utils/actions/userActions';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { DataItem } from '../components/DataItem';
+import { SubmitButton } from '../components/SubmitButton';
+import { removeUserFromChat } from '../utils/actions/chatActions';
 
 export const ContactScreen = ({ navigation, route }) => {
   const storedUsers = useSelector((state) => state.users.storedUsers);
   const currentUser = storedUsers[route.params.uid];
 
   const storedChats = useSelector((state) => state.chats.chatsData);
+  const userData = useSelector((state) => state.auth.userData);
   const [commonChats, setCommonChats] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const chatId = route.params.chatId;
+  const chatData = chatId && storedChats[chatId];
 
   useEffect(() => {
     const getCommonUserChats = async () => {
@@ -27,6 +34,19 @@ export const ContactScreen = ({ navigation, route }) => {
 
     getCommonUserChats();
   }, []);
+
+  const removeFromChat = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      await removeUserFromChat(userData, currentUser, chatData);
+
+      navigation.goBack();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigation, isLoading]);
 
   return (
     <PageContainer>
@@ -63,6 +83,16 @@ export const ContactScreen = ({ navigation, route }) => {
             );
           })}
         </>
+      )}
+
+      {chatData && chatData.isGroupChat && isLoading ? (
+        <ActivityIndicator size='small' color={colors.primary} />
+      ) : (
+        <SubmitButton
+          title='Remove from chat'
+          color={colors.red}
+          onPress={removeFromChat}
+        />
       )}
     </PageContainer>
   );
