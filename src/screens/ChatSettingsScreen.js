@@ -13,7 +13,10 @@ import { ProfileImage } from '../components/ProfileImage';
 import { Input } from '../components/Input';
 import { reducer } from '../reducers/formReducer';
 import { validateInput } from '../utils/actions/formActions';
-import { updateChatData } from '../utils/actions/chatActions';
+import {
+  removeUserFromChat,
+  updateChatData,
+} from '../utils/actions/chatActions';
 import { SubmitButton } from '../components/SubmitButton';
 import colors from '../constants/colors';
 import { DataItem } from '../components/DataItem';
@@ -23,7 +26,7 @@ export const ChatSettingsScreen = ({ navigation, route }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const chatId = route.params.chatId;
-  const chatData = useSelector((state) => state.chats.chatsData[chatId]);
+  const chatData = useSelector((state) => state.chats.chatsData[chatId] || {});
   const userData = useSelector((state) => state.auth.userData);
   const storedUsers = useSelector((state) => state.users.storedUsers);
 
@@ -66,6 +69,22 @@ export const ChatSettingsScreen = ({ navigation, route }) => {
     const currentValues = formState.inputValues;
     return currentValues.chatName != chatData.chatName;
   };
+
+  const leaveChat = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      await removeUserFromChat(userData, userData, chatData);
+
+      navigation.popToTop();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigation, isLoading]);
+
+  if (!chatData.users) return null;
 
   return (
     <PageContainer>
@@ -129,6 +148,14 @@ export const ChatSettingsScreen = ({ navigation, route }) => {
           )
         )}
       </ScrollView>
+      {
+        <SubmitButton
+          title='Leave chat'
+          color={colors.red}
+          onPress={() => leaveChat()}
+          style={{ marginBottom: 20 }}
+        />
+      }
     </PageContainer>
   );
 };

@@ -58,7 +58,7 @@ export const ChatScreen = ({ navigation, route }) => {
   });
 
   const chatData =
-    (chatId && storedChats[chatId]) || route?.params?.newChatData;
+    (chatId && storedChats[chatId]) || route?.params?.newChatData || {};
 
   const sendMessage = useCallback(async () => {
     try {
@@ -92,11 +92,11 @@ export const ChatScreen = ({ navigation, route }) => {
     );
   };
 
-  const title = chatData.chatName ?? getChatTitleFromName();
-
   useEffect(() => {
+    if (!chatData) return;
+
     navigation.setOptions({
-      headerTitle: title,
+      headerTitle: chatData.chatName ?? getChatTitleFromName(),
       headerRight: () => {
         return (
           <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
@@ -118,7 +118,7 @@ export const ChatScreen = ({ navigation, route }) => {
       },
     });
     setChatUsers(chatData.users);
-  }, [chatUsers, title]);
+  }, [chatUsers]);
 
   const pickImage = useCallback(async () => {
     try {
