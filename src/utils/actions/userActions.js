@@ -7,6 +7,7 @@ import {
   orderByChild,
   startAt,
   endAt,
+  remove,
 } from 'firebase/database';
 import { getFirebaseApp } from '../firebaseHalper';
 
@@ -19,6 +20,19 @@ export const getUserData = async (userId) => {
     return snapshots.val();
   } catch (e) {
     console.log('getUserData.e', e);
+  }
+};
+
+export const deleteUserChat = async (userId, key) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const chatRef = child(dbRef, `userChats/${userId}/${key}`);
+
+    await remove(chatRef);
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 };
 
