@@ -9,6 +9,7 @@ import {
   update,
 } from 'firebase/database';
 import { getFirebaseApp } from '../firebaseHalper';
+import { deleteUserChat, getUserChats } from './userActions';
 
 export const createChat = async (loggedInUserId, chatData) => {
   const newChatData = {
@@ -64,7 +65,6 @@ const sendMessage = async (
   imageUrl,
   replyTo,
 ) => {
-  const app = getFirebaseApp();
   const dbRef = ref(getDatabase());
   const messagesRef = child(dbRef, `messages/${chatId}`);
 
@@ -118,5 +118,28 @@ export const starMessage = async (messageId, chatId, userId) => {
     }
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const removeUserFromChat = async (
+  userLoggedInData,
+  userToRemoveData,
+  chatData,
+) => {
+  const userToRemoveId = userToRemoveData.userId;
+  const newUsers = chatData.users.filter((uid) => uid !== userToRemoveId);
+  await updateChatData(chatData.key, userLoggedInData.userId, {
+    users: newUsers,
+  });
+
+  const userChats = await getUserChats(userToRemoveId);
+
+  for (const key in userChats) {
+    const currentChatId = userChats[key];
+
+    if (currentChatId === chatData.key) {
+      await deleteUserChat(userToRemoveId, key);
+      break;
+    }
   }
 };
