@@ -95,6 +95,11 @@ export const Bubble = ({
       Container = TouchableWithoutFeedback;
       isUserMessage = true;
       break;
+    case 'info':
+      bubbleStyle.backgroundColor = 'white';
+      bubbleStyle.alignItems = 'center';
+      textStyle.color = colors.textColor;
+      break;
 
     case 'reply':
       bubbleStyle.backgroundColor = '#f2f2f2';
@@ -123,7 +128,7 @@ export const Bubble = ({
         style={{ width: '100%' }}
       >
         <View style={bubbleStyle}>
-          {name && <Text style={styles.name}>{name}</Text>}
+          {name && type !== 'info' && <Text style={styles.name}>{name}</Text>}
           {replyingToUser && (
             <Bubble
               type='reply'
@@ -137,7 +142,7 @@ export const Bubble = ({
             <Image source={{ uri: imageUrl }} style={styles.image} />
           )}
 
-          {dateString && (
+          {dateString && type !== 'info' && (
             <View style={styles.timeContainer}>
               {isStarred && (
                 <FontAwesome
