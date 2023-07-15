@@ -13,11 +13,14 @@ export const DataItem = ({
   type,
   isChecked,
   icon,
+  hideImage,
 }) => {
+  const hideImg = hideImage === true;
+
   return (
     <TouchableWithoutFeedback onPress={onPress}>
       <View style={styles.container}>
-        {!icon && <ProfileImage uri={image} size={imageSize} />}
+        {!icon && !hideImg && <ProfileImage uri={image} size={imageSize} />}
 
         {icon && (
           <View style={styles.leftIconContainer}>
