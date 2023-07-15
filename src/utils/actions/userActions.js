@@ -8,6 +8,7 @@ import {
   startAt,
   endAt,
   remove,
+  push,
 } from 'firebase/database';
 import { getFirebaseApp } from '../firebaseHalper';
 
@@ -20,6 +21,19 @@ export const getUserData = async (userId) => {
     return snapshots.val();
   } catch (e) {
     console.log('getUserData.e', e);
+  }
+};
+
+export const addUserChat = async (userId, chatId) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const chatRef = child(dbRef, `userChats/${userId}`);
+
+    await push(chatRef, chatId);
+  } catch (error) {
+    console.log('addUserChat.error', error);
+    throw error;
   }
 };
 

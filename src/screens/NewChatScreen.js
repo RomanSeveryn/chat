@@ -34,8 +34,12 @@ export const NewChatScreen = ({ navigation, route }) => {
   const userData = useSelector((state) => state.auth.userData);
   const storedUsers = useSelector((state) => state.users.storedUsers);
 
+  const chatId = route.params && route.params.chatId;
   const isGroupChat = route.params && route.params.isGroupChat;
-  const isGroupChatDisabled = selectedUsers.length === 0 || chatName === '';
+  const isGroupChatDisabled =
+    selectedUsers.length === 0 || (isNewChat && chatName === '');
+  const existingUsers = route.params && route.params.existingUsers;
+  const isNewChat = !chatId;
 
   useEffect(() => {
     navigation.setOptions({
@@ -51,13 +55,16 @@ export const NewChatScreen = ({ navigation, route }) => {
           <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
             {isGroupChat && (
               <Item
-                title='Create'
+                title={isNewChat ? 'Create' : 'Add'}
                 disabled={isGroupChatDisabled}
                 color={isGroupChatDisabled ? colors.lightGrey : undefined}
                 onPress={() => {
-                  navigation.navigate('ChatList', {
+                  const screenName = isNewChat ? 'ChatList' : 'ChatSettings';
+
+                  navigation.navigate(screenName, {
                     selectedUsers,
                     chatName,
+                    chatId,
                   });
                 }}
               />
@@ -112,51 +119,52 @@ export const NewChatScreen = ({ navigation, route }) => {
 
   return (
     <PageContainer>
-      {isGroupChat && (
-        <>
-          <View style={styles.chatNameContainer}>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.textBox}
-                placeholder='Enter a name for your chat'
-                autoCorrect={false}
-                // autoComplete={false}
-                value={chatName}
-                onChangeText={(text) => setChatName(text)}
-              />
-            </View>
-          </View>
-
-          <View style={styles.selectedUsersContainer}>
-            <FlatList
-              data={selectedUsers}
-              contentContainerStyle={{ alignItems: 'center' }}
-              // ref={(ref) => (selectedUsersFlatListRef.current = ref)}
-              // onContentSizeChange={() =>
-              //   selectedUsersFlatListRef.current.scrollToEnd()
-              // }
-              keyExtractor={(item) => item}
-              horizontal={true}
-              renderItem={(itemData) => {
-                const userId = itemData.item;
-                const userData = storedUsers[userId];
-                return (
-                  <ProfileImage
-                    style={styles.selectedUserStyle}
-                    uri={userData.profilePicture}
-                    size={40}
-                    onPress={() => userPressed(userId)}
-                    showRemoveButton={true}
-                  />
-                );
-              }}
-              style={styles.selectedUsersList}
+      {isNewChat && isGroupChat && (
+        <View style={styles.chatNameContainer}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.textbox}
+              placeholder='Enter a name for your chat'
+              autoCorrect={false}
+              // autoComplete={false}
+              onChangeText={(text) => setChatName(text)}
             />
           </View>
-        </>
+        </View>
       )}
+
+      {isGroupChat && (
+        <View style={styles.selectedUsersContainer}>
+          <FlatList
+            style={styles.selectedUsersList}
+            data={selectedUsers}
+            horizontal={true}
+            keyExtractor={(item) => item}
+            contentContainerStyle={{ alignItems: 'center' }}
+            // ref={(ref) => (selectedUsersFlatList.current = ref)}
+            // onContentSizeChange={() =>
+            //   selectedUsersFlatList.current.scrollToEnd()
+            // }
+            renderItem={(itemData) => {
+              const userId = itemData.item;
+              const userData = storedUsers[userId];
+              return (
+                <ProfileImage
+                  style={styles.selectedUserStyle}
+                  size={40}
+                  uri={userData.profilePicture}
+                  onPress={() => userPressed(userId)}
+                  showRemoveButton={true}
+                />
+              );
+            }}
+          />
+        </View>
+      )}
+
       <View style={styles.searchContainer}>
         <FontAwesome name='search' size={15} color={colors.lightGrey} />
+
         <TextInput
           placeholder='Search'
           style={styles.searchBox}
@@ -176,6 +184,10 @@ export const NewChatScreen = ({ navigation, route }) => {
           renderItem={(itemData) => {
             const userId = itemData.item;
             const userData = users[userId];
+
+            if (existingUsers && existingUsers.includes(userId)) {
+              return;
+            }
 
             return (
               <DataItem
@@ -249,15 +261,15 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: '100%',
-    paddingVertical: 15,
     paddingHorizontal: 10,
+    paddingVertical: 15,
     backgroundColor: colors.nearlyWhite,
     flexDirection: 'row',
     borderRadius: 2,
   },
-  textBox: {
-    width: '100%',
+  textbox: {
     color: colors.textColor,
+    width: '100%',
     fontFamily: 'regular',
     letterSpacing: 0.3,
   },
